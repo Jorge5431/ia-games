@@ -170,3 +170,47 @@ img{display:block}
   }
 }
 .category-grid svg{flex:none}
+
+/* Personal appearance settings. Server-rendered cookie prevents theme flashes. */
+:root[data-theme=light]{color-scheme:light;--bg:#f6f0e6;--bg2:#fffaf3;--surface:#ece2d6;--text:#28191d;--muted:#69545b;--line:#cdb8be;--focus:#801c32}
+@media(prefers-color-scheme:light){:root[data-theme=system]{color-scheme:light;--bg:#f6f0e6;--bg2:#fffaf3;--surface:#ece2d6;--text:#28191d;--muted:#69545b;--line:#cdb8be;--focus:#801c32}}
+:root[data-text-size=large] body{font-size:19px}
+:root[data-contrast=high]{--muted:var(--text);--line:var(--text)}
+:root[data-density=compact] .card-grid{grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:.65rem}
+:root[data-density=compact] .game-card-text{padding:.55rem}
+.preferences-panel{max-width:900px;width:100%;margin-inline:auto}
+.preferences-panel label{display:grid;gap:.45rem}
+.preferences-panel .preference-check{display:flex;align-items:center;gap:.75rem}
+.preference-check input{width:20px;height:20px;accent-color:var(--accent)}
+.preferences-panel [role=status]{min-height:1.5em;color:var(--muted)}
+.empty{background:var(--bg2)}
+.secondary,.icon-button{background:var(--surface);color:var(--text)}
+.secondary:hover,.icon-button:hover{background:var(--primary);color:#fff4e8}
+.category-grid a:hover{background:var(--surface)}
+.hero{color:#f2e5d2}
+.confirmation-page{place-items:center;min-height:70vh}
+.confirmation-card{max-width:680px;text-align:center;justify-items:center;padding:clamp(1.5rem,5vw,4rem);gap:1.5rem}
+.confirmation-card h1{font-size:clamp(2.5rem,6vw,4rem)}
+.confirmation-symbol{color:var(--accent);border:1px solid var(--line);border-radius:50%;padding:1.25rem;background:var(--surface)}
+.confirmation-card .toolbar{justify-content:center}
+/* Decorative depth layers never capture clicks or overlap readable content. */
+.depth-backdrop{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:-2;border-radius:inherit}
+.depth-backdrop span{position:absolute;display:block;will-change:transform}
+.depth-halo{width:55%;aspect-ratio:1;right:-7%;top:-10%;background:radial-gradient(circle,#d64b6238,transparent 66%)}
+.depth-ring{width:42%;aspect-ratio:1;right:4%;top:7%;border:1px solid #f2c2ad55;border-radius:50%;box-shadow:0 0 0 26px #bd28460a,0 0 0 65px #bd28460a}
+.depth-cross{width:45px;height:45px;right:44%;top:20%;background:linear-gradient(#f2c2ad88,#f2c2ad88) center/1px 100% no-repeat,linear-gradient(#f2c2ad88,#f2c2ad88) center/100% 1px no-repeat}
+.depth-line{width:38%;height:1px;right:0;bottom:20%;background:linear-gradient(90deg,transparent,#f2c2ad88,transparent)}
+.institution-art{background:transparent}
+.hero-art{background:radial-gradient(ellipse at 69% 40%,#985037 0%,#4b1926 23%,#241018 53%,#130d10 80%)}
+.institution-art img{position:relative;z-index:1}
+.hero>.depth-backdrop{z-index:-2}
+.gallery{position:relative;isolation:isolate;padding:1rem}
+.gallery>.depth-backdrop{z-index:-1;background:radial-gradient(ellipse at 80% 40%,#bd284622,transparent 65%)}
+@media(max-width:700px){.depth-backdrop span{transform:none!important;will-change:auto}.depth-cross{display:none}.header-actions{gap:.35rem}.header-inner{gap:.6rem}.brand{letter-spacing:.08em;font-size:.85rem}}
+:root[data-motion=reduced] *, :root[data-motion=reduced] *::before, :root[data-motion=reduced] *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+:root[data-motion=reduced] .depth-backdrop span,:root[data-motion=reduced] .hero-image-track,:root[data-motion=reduced] .game-card,:root[data-motion=reduced] .game-cover img{transform:none!important;translate:none!important;scale:none!important;will-change:auto}
+@media(prefers-reduced-motion:reduce){.depth-backdrop span{transform:none!important;will-change:auto}}
+.hero-art>.depth-backdrop{z-index:0}
+.hero-image-track,.institution-art{z-index:1}
+.preferences-panel select,.field input,.field select,.field textarea{background:var(--bg2);color:var(--text);border:1px solid var(--line);padding:.65rem;border-radius:8px;font:inherit;min-width:0;width:100%;min-height:44px}
+@media(max-width:440px){.preferences-panel .form-grid{grid-template-columns:1fr}}

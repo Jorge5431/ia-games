@@ -1,8 +1,11 @@
 'use client';
+import { useGentleMotion } from './preferences-provider';
 
 import Image from 'next/image';
+import { DepthBackdrop } from './depth-backdrop';
+import { usePreferences } from './preferences-provider';
 import Link from 'next/link';
-import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
+import { AnimatePresence, motion, useScroll, useTransform } from 'motion/react';
 import { ArrowRight, ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
@@ -10,7 +13,8 @@ export type Slide = { title:string; summary:string; href:string; image:string|nu
 const INTERVAL = 6500;
 
 export function Hero({ slides }: {slides:Slide[]}) {
-  const reduced = useReducedMotion();
+  const reduced = useGentleMotion();
+  const {preferences}=usePreferences();
   const [index,setIndex] = useState(0);
   const [paused,setPaused] = useState(false);
   const [interacting,setInteracting] = useState(false);
@@ -20,7 +24,7 @@ export function Hero({ slides }: {slides:Slide[]}) {
   const {scrollYProgress} = useScroll({target:section,offset:['start start','end start']});
   const y = useTransform(scrollYProgress,[0,1],['0%','9%']);
   const rotating = slides.length>1;
-  const active = rotating && !paused && !interacting && !focused && !reduced;
+  const active = preferences.autoplay && rotating && !paused && !interacting && !focused && !reduced;
 
   useEffect(() => {
     if (!active) return;
@@ -49,7 +53,7 @@ export function Hero({ slides }: {slides:Slide[]}) {
     }}>
     <AnimatePresence initial={false}>
       <motion.div key={slide.href} className="hero-art" aria-hidden initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced?0:.4}}>
-        {slide.image ? <motion.div className="hero-image-track" style={{y}}><Image src={slide.image} alt="" fill sizes="100vw" className="hero-image" priority={index===0}/></motion.div> :
+        <DepthBackdrop/>{slide.image ? <motion.div className="hero-image-track" style={reduced?undefined:{y}}><Image src={slide.image} alt="" fill sizes="100vw" className="hero-image" priority={index===0}/></motion.div> :
           <div className="institution-art"><div className="art-grid"/><span className="art-orbit"/><Image src="/marca-vornelix.webp" alt="" width={380} height={380} priority/></div>}
       </motion.div>
     </AnimatePresence>

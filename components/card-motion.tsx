@@ -1,10 +1,11 @@
 'use client';
+import { useGentleMotion } from './preferences-provider';
 
-import { motion, useMotionValue, useReducedMotion, useSpring } from 'motion/react';
+import { motion, useMotionValue, useSpring } from 'motion/react';
 import type { ReactNode } from 'react';
 
 export function CardMotion({children,index=0,tilt=false}: {children:ReactNode;index?:number;tilt?:boolean}) {
-  const reduced=useReducedMotion();
+  const reduced=useGentleMotion();
   const x=useMotionValue(0);
   const y=useMotionValue(0);
   const rotateX=useSpring(x,{stiffness:250,damping:25});

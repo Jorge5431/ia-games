@@ -10,7 +10,9 @@ export async function GET(request: NextRequest) {
   const code = params.get('code');
   const type = params.get('type');
   const target = nextPath(params.get('next'));
-  const destination = new URL(type === 'recovery' ? '/reset-password' : target, siteUrl());
+  const recovery=type === 'recovery' || target === '/reset-password';
+  const destination = new URL(recovery ? '/reset-password' : '/auth/confirmed', siteUrl());
+  if (!recovery) destination.searchParams.set('next',target);
   if (client) {
     const result = token && (type === 'email' || type === 'signup' || type === 'recovery')
       ? await client.auth.verifyOtp({token_hash:token, type})

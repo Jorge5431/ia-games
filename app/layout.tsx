@@ -1,5 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { cookies } from 'next/headers';
+import { parsePreferences, preferenceCookie } from '@/lib/preferences';
+import { PreferencesProvider } from '@/components/preferences-provider';
 import { Navigation } from '@/components/navigation';
 import { session } from '@/lib/supabase';
 import { siteUrl } from '@/lib/config';
@@ -17,7 +20,8 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({children}:Readonly<{children:React.ReactNode}>) {
   const current=await session();
-  return <html lang="pt-BR"><body>
+  const preferences=parsePreferences((await cookies()).get(preferenceCookie)?.value);
+  return <html lang="pt-BR" data-theme={preferences.theme} data-motion={preferences.motion} data-text-size={preferences.textSize} data-contrast={preferences.contrast} data-density={preferences.density}><body><PreferencesProvider initial={preferences}>
     <a className="skip" href="#main">Pular para o conteúdo</a>
     <Navigation signedIn={Boolean(current)}/>
     <main id="main">{children}</main>
@@ -25,5 +29,5 @@ export default async function RootLayout({children}:Readonly<{children:React.Rea
       <div><Link className="brand" href="/">VORNELIX</Link><p className="muted">Gaming Reimagined</p></div>
       <nav aria-label="Institucional"><Link href="/about">Sobre</Link><Link href="/support">Suporte</Link><Link href="/terms">Termos</Link><Link href="/privacy">Privacidade</Link></nav>
     </div></footer>
-  </body></html>;
+  </PreferencesProvider></body></html>;
 }

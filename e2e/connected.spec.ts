@@ -60,6 +60,8 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     expect(profile.data).toEqual({role:'player',display_name:'Jogador teste'});
 
     await clickMailLink(page,request,email,'email');
+    await expect(page.getByRole('heading',{name:'E-mail confirmado!'})).toBeVisible();
+    await page.getByRole('link',{name:'Continuar para minha conta'}).click();
     await expect(page).toHaveURL('/account');
     await page.reload();
     await expect(page.getByRole('heading',{name:'Jogador teste'})).toBeVisible();

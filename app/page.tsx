@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 import { catalog, filters, publicImage } from '@/lib/catalog';
 import { Hero, type Slide } from '@/components/hero';
@@ -7,7 +8,9 @@ import { Categories, Empty, GameGrid, emptyCatalogMessage } from '@/components/c
 
 const institutional: Slide = {title:'Gaming Reimagined',summary:'Uma nova loja para descobrir jogos criados com inteligência artificial.',href:'/store',image:null};
 
-export default async function Home() {
+export default async function Home({searchParams}:{searchParams:Promise<{code?:string}>}) {
+  const params=await searchParams;
+  if(params.code) redirect('/auth/callback?'+new URLSearchParams({code:params.code}));
   const [recent,top,free,paid,popular]=await Promise.all([
     catalog(filters({}),8),catalog(filters({order:'rating',rating:'1'}),4),
     catalog(filters({price:'free'}),4),catalog(filters({price:'paid'}),4),
