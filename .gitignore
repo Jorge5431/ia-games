@@ -7,3 +7,6 @@ test-results/
 coverage/
 *.tsbuildinfo
 next-env.d.ts
+
+supabase/.temp/
+supabase/.branches/
