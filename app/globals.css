@@ -63,8 +63,8 @@ img{display:block}
 .text-link:hover{text-decoration:underline}
 .panel,.empty{padding:clamp(1.1rem,3vw,1.9rem);background:var(--bg2);border:1px solid var(--line);border-radius:13px;display:grid;gap:.75rem}
 .empty{background:linear-gradient(115deg,#201416,#151012)}
-.category-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(145px,100%),1fr));gap:.65rem}
-.category-grid a{display:flex;justify-content:space-between;align-items:center;min-height:51px;padding:.65rem .85rem;border:1px solid var(--line);border-radius:8px;background:var(--bg2);font-weight:630}
+.category-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(150px,100%),1fr));gap:.65rem}
+.category-grid a{display:flex;justify-content:space-between;align-items:center;gap:.5rem;min-height:51px;padding:.65rem .85rem;border:1px solid var(--line);border-radius:8px;background:var(--bg2);font-weight:630}
 .category-grid a:hover{border-color:#995163;background:#2c1920}
 .card-grid,.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
 .game-card{min-width:0;background:var(--bg2);border:1px solid var(--line);border-radius:12px;overflow:hidden;transition:border-color .28s,box-shadow .28s,scale .28s,translate .28s}
@@ -169,3 +169,4 @@ img{display:block}
     @keyframes scroll-reveal{from{transform:translateY(8px);opacity:.68;clip-path:inset(0 0 8%)}to{transform:translateY(0);opacity:1;clip-path:inset(0)}}
   }
 }
+.category-grid svg{flex:none}

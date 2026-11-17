@@ -19,7 +19,7 @@ export function Navigation({signedIn}: {signedIn:boolean}) {
   return <header className="site-header" onKeyDown={event => { if(event.key==='Escape') setOpenOn(null); }}>
     <div className="container header-inner">
       <Link href="/" className="brand" aria-label="Vornelix — início">
-        <Image src="/marca-vornelix.webp" width={36} height={36} alt=""/>
+        <Image src="/simbolo-vornelix.webp" width={36} height={36} alt=""/>
         <span>VORNELIX</span>
       </Link>
       <nav className="desktop-nav" aria-label="Navegação principal">{primary.map(([href,label]) =>
