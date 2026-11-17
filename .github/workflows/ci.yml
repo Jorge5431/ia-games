@@ -1,0 +1,69 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches:
+      - "rebuild/**"
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test
+      - run: npm run build
+      - name: Prepare Chromium
+        run: |
+          if command -v google-chrome >/dev/null; then
+            echo "PLAYWRIGHT_CHROMIUM_EXECUTABLE=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          else
+            npx playwright install --with-deps chromium --only-shell
+          fi
+      - run: npm run test:e2e
+  supabase-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx supabase start
+      - name: GitHub runner's isolated Supabase credentials
+        shell: bash
+        run: |
+          source <(npx supabase status -o env)
+          test -n "${API_URL:-}"
+          publishable="${PUBLISHABLE_KEY:-${ANON_KEY:-}}"
+          secret="${SECRET_KEY:-${SERVICE_ROLE_KEY:-}}"
+          test -n "$publishable"
+          test -n "$secret"
+          echo "::add-mask::$publishable"
+          echo "::add-mask::$secret"
+          {
+            echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
+            echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$publishable"
+            echo "VORNELIX_TEST_SUPABASE_KEY=$secret"
+            echo "VORNELIX_TEST_SUPABASE=1"
+            echo "VORNELIX_LOCAL_TEST=1"
+          } >> "$GITHUB_ENV"
+      - run: npm run build
+      - name: Prepare Chromium
+        run: |
+          if command -v google-chrome >/dev/null; then
+            echo "PLAYWRIGHT_CHROMIUM_EXECUTABLE=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          else
+            npx playwright install --with-deps chromium --only-shell
+          fi
+      - run: npm run test:e2e -- e2e/connected.spec.ts
