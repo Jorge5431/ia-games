@@ -6,8 +6,8 @@ import { PreferencesProvider } from '@/components/preferences-provider';
 import { Navigation } from '@/components/navigation';
 import { session } from '@/lib/supabase';
 import { siteUrl } from '@/lib/config';
-import '@fontsource/barlow-condensed/latin-700.css';
-import '@fontsource/barlow-condensed/latin-900.css';
+import '@fontsource/archivo-black/latin-400.css';
+import '@fontsource/raleway/latin-300.css';
 import '@fontsource-variable/instrument-sans';
 import './globals.css';
 
