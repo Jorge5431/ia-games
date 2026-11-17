@@ -6,6 +6,8 @@ export default defineConfig({
   use:{
     baseURL:'http://localhost:3000',
     trace:'retain-on-failure',
+    actionTimeout:12000,
+    navigationTimeout:25000,
     launchOptions:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE ? {executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE}:undefined,
   },
   projects:[{name:'chromium',use:{...devices['Desktop Chrome']}}],

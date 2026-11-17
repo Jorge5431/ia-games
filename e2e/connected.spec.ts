@@ -117,6 +117,7 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     }
 
     await login(page,developer);
+    await expect(page).toHaveURL('/account');
     await page.goto('/developer/apply');
     await page.getByLabel('Nome do estúdio').fill('Estúdio '+run);
     await page.getByLabel('Como você usa IA').fill('Utilizamos IA na criação dos recursos visuais.');
@@ -126,6 +127,7 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     const adminContext=await browser.newContext();
     const adminPage=await adminContext.newPage();
     await login(adminPage,admin);
+    await expect(adminPage).toHaveURL('/account');
     await adminPage.goto('/admin/developers');
     await adminPage.getByRole('heading',{name:'Estúdio '+run}).locator('../..').getByRole('button',{name:'Aprovar',exact:true}).click();
     await expect(adminPage.getByRole('heading',{name:'Estúdio '+run}).locator('..')).toContainText('Aprovada');
@@ -166,9 +168,11 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     const buyer=await browser.newContext();
     const buyerPage=await buyer.newPage();
     await login(buyerPage,player);
+    await expect(buyerPage).toHaveURL('/account');
     await buyerPage.goto('/game/'+slug);
     await expect(buyerPage.getByRole('button',{name:'Publicar avaliação'})).toHaveCount(0);
     await buyerPage.getByRole('button',{name:'Adicionar aos favoritos'}).click();
+    await expect(buyerPage.getByRole('button',{name:'Remover dos favoritos'})).toBeVisible();
     await buyerPage.goto('/wishlist');
     await expect(buyerPage.getByRole('heading',{name:title})).toBeVisible();
     await buyerPage.getByRole('button',{name:'Remover dos favoritos'}).click();
