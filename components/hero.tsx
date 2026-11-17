@@ -49,7 +49,7 @@ export function Hero({ slides }: {slides:Slide[]}) {
     }}>
     <AnimatePresence initial={false}>
       <motion.div key={slide.href} className="hero-art" aria-hidden initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced?0:.4}}>
-        {slide.image ? <motion.div className="hero-image-track" style={reduced ? undefined : {y}}><Image src={slide.image} alt="" fill sizes="100vw" className="hero-image" priority={index===0}/></motion.div> :
+        {slide.image ? <motion.div className="hero-image-track" style={{y}}><Image src={slide.image} alt="" fill sizes="100vw" className="hero-image" priority={index===0}/></motion.div> :
           <div className="institution-art"><div className="art-grid"/><span className="art-orbit"/><Image src="/marca-vornelix.webp" alt="" width={380} height={380} priority/></div>}
       </motion.div>
     </AnimatePresence>

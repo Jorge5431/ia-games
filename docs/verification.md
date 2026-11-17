@@ -11,7 +11,7 @@
 | Dependências | `npm audit` encontrou zero vulnerabilidades |
 | Supabase hospedado | Duas migrations aplicadas e consultadas. Catálogo com zero jogos publicados e um perfil preexistente. Bucket de builds privado e sem políticas de objetos |
 | Auth hospedado | Cadastro por e-mail habilitado com confirmação obrigatória. Entrega SMTP e recuperação pendentes de validação em um site implantado |
-| Integração com Supabase local | Dois testes integrados Playwright com Auth, SMTP capturado, Data API e Storage foram incluídos. A execução local requer Docker, indisponível neste ambiente. Consulte os resultados de Actions no PR |
+| Integração com Supabase local | Dois testes integrados passaram no GitHub Actions com Auth, SMTP capturado, Data API e Storage. A execução local requer Docker. Consulte os resultados de Actions no PR |
 
 A suíte Chromium testou desktop e emulação de dispositivos móveis. Esses resultados não medem desempenho de campo em Android ou iPhone. Os 60 FPS e Core Web Vitals de campo dependem de dados reais e de dispositivos físicos.
 
@@ -21,7 +21,7 @@ A suíte Chromium testou desktop e emulação de dispositivos móveis. Esses res
 | --- | --- |
 | Entrar, cadastrar, confirmar cadastro, sair, recuperar senha, redefinir senha | Formulários e callback conectados ao Supabase Auth. Rotas, redirecionamento e link inválido passaram no Chromium. O trigger e a atribuição player passaram no banco. O fluxo com e-mail e credenciais depende da suíte de integração |
 | Pesquisar, explorar, categorias, filtrar, ordenar, limpar, paginar | Navegação, envio de filtros e retorno testados no Chromium. Catálogo com exclusão de rascunhos e ordenação de avaliações verificado em PostgreSQL |
-| Anterior, próximo, pausar e selecionar banner, galeria e teclado | Aparecem quando há mídia real publicada. O banner institucional respeitou movimento reduzido no Chromium. Controles de slides e galeria com várias mídias exigem catálogo de teste e não foram exercitados no ambiente local |
+| Anterior, próximo, pausar e selecionar banner, galeria e teclado | Aparecem quando há mídia real publicada. Autoplay, pausa, retomada, setas, indicadores, gesto touch e controles de galeria passaram em uma página Chromium isolada com dois slides e duas imagens. O zoom da capa foi verificado separadamente com e sem movimento reduzido |
 | Detalhes e compartilhar | Detalhes usam o slug público. Compartilhamento usa a API do navegador ou a área de transferência. A página 404 passou no Chromium |
 | Comprar, adicionar à biblioteca, download | Checkout exige sessão e preço de produto publicado. Aquisição gratuita e proibição de adquirir jogos pagos verificadas no banco. Decisões de propriedade, revisão do arquivo e indisponibilidade verificadas em testes unitários |
 | Adicionar e remover favoritos | RLS e persistência verificadas com perfis distintos no banco. Interação autenticada coberta pela suíte de integração |

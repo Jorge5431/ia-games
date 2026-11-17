@@ -126,7 +126,7 @@ img{display:block}
 .thumbnails{display:flex;gap:.5rem;overflow:auto}
 .thumbnails button{flex:none;border:2px solid transparent;border-radius:7px;overflow:hidden}
 .thumbnails button[aria-pressed=true]{border-color:var(--focus)}
-.thumbnails img{object-fit:cover}
+.thumbnails img{width:96px;height:54px;object-fit:cover}
 .preformatted{white-space:pre-wrap}
 .price{font-size:1.7rem;font-weight:800}
 .metric{font-size:2rem;font-weight:850}

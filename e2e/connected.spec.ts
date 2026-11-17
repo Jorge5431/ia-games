@@ -146,8 +146,12 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     await page.getByRole('button',{name:'Enviar capa'}).click();
     await expect(page.getByRole('img',{name:'Capa',exact:true})).toBeVisible();
     await page.getByRole('link',{name:/Voltar para/}).click();
-    const guestContext=await browser.newContext();
+    const guestContext=await browser.newContext({reducedMotion:'reduce'});
     const guest=await guestContext.newPage();
+    const hydrationErrors:string[]=[];
+    guest.on('console',message=>{
+      if(message.type()==='error' && /hydrat|#418/i.test(message.text())) hydrationErrors.push(message.text());
+    });
     await guest.goto('/game/'+slug);
     await expect(guest.getByRole('heading',{level:1})).toHaveText('Página não encontrada');
 
@@ -158,11 +162,14 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     await moderation.getByLabel('Decisão').selectOption('approve');
     await moderation.getByRole('button',{name:'Registrar decisão'}).click();
     await expect(moderation).toHaveCount(0);
+    await guest.goto('/');
+    await expect(guest.getByRole('heading',{level:1})).toHaveText(title);
     await guest.goto('/search?q='+encodeURIComponent(title));
     await guest.getByRole('link',{name:new RegExp(title)}).click();
     await expect(guest.getByRole('heading',{level:1})).toHaveText(title);
     await guest.getByRole('link',{name:'Download',exact:true}).click();
     await expect(guest).toHaveURL(/\/login\?next=/);
+    expect(hydrationErrors).toEqual([]);
     await guestContext.close();
 
     const buyer=await browser.newContext();
