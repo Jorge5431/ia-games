@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { catalog, filters, publicImage } from '@/lib/catalog';
 import { Hero, type Slide } from '@/components/hero';
+import { Button } from '@/components/ui/button';
 import { Categories, Empty, GameGrid, emptyCatalogMessage } from '@/components/catalog-view';
 
 const institutional: Slide = {title:'Gaming Reimagined',summary:'Uma nova loja para descobrir jogos criados com inteligência artificial.',href:'/store',image:null};
@@ -32,6 +33,6 @@ export default async function Home() {
         <div className="section-title"><h2>{title}</h2><Link className="text-link" href={href}>Ver todos</Link></div><GameGrid games={games} tilt={href==='/store'}/>
       </section>)}
     <section className="page-section"><h2>Explore por categoria</h2><Categories/></section>
-    <section className="panel"><h2>Cria jogos com IA?</h2><p className="muted">Solicite acesso ao portal para preparar seu jogo e enviá-lo para análise.</p><div><Link className="button secondary" href="/developer/apply">Tornar-se desenvolvedor<ArrowRight size={17}/></Link></div></section>
+    <section className="panel"><h2>Cria jogos com IA?</h2><p className="muted">Solicite acesso ao portal para preparar seu jogo e enviá-lo para análise.</p><div><Button asChild variant="secondary"><Link href="/developer/apply">Tornar-se desenvolvedor<ArrowRight size={17}/></Link></Button></div></section>
   </div>;
 }

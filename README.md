@@ -1,6 +1,6 @@
 # VORNELIX 2.0
 
-Marketplace de jogos desenvolvidos com inteligência artificial. A aplicação usa Next.js App Router, TypeScript estrito, Tailwind CSS, Motion for React e Supabase Auth, PostgreSQL e Storage.
+Marketplace de jogos desenvolvidos com inteligência artificial. A aplicação usa Next.js App Router, TypeScript estrito, Tailwind CSS, shadcn/ui, Motion for React e Supabase Auth, PostgreSQL e Storage.
 
 ## Iniciar
 

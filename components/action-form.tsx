@@ -2,6 +2,7 @@
 
 import { useActionState, type ReactNode } from 'react';
 import { LoaderCircle } from 'lucide-react';
+import { Button } from './ui/button';
 
 export type ActionState = { error?: string; success?: string; fieldErrors?: Record<string,string> };
 export type SubmitAction = (previous: ActionState, form: FormData) => Promise<ActionState>;
@@ -13,9 +14,9 @@ export function ActionForm({ action, label, children, className, secondary }: {
   return <form action={submit} className={className ?? 'form'}>
     <fieldset disabled={pending}>
       {children}
-      <button className={secondary ? 'button secondary' : 'button'} type="submit" aria-busy={pending}>
+      <Button variant={secondary ? 'secondary' : 'default'} type="submit" aria-busy={pending}>
         {pending && <LoaderCircle size={16} className="spinner" aria-hidden/>}{label}
-      </button>
+      </Button>
     </fieldset>
     {state.error && <p className="feedback error" role="alert">{state.error}</p>}
     {state.success && <p className="feedback success" role="status">{state.success}</p>}
