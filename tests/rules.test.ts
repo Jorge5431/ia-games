@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { calculateRatings, downloadState, nextPath, password, purchaseState } from '../lib/rules';
+import { z } from 'zod';
+import { calculateRatings, downloadState, httpsUrl, nextPath, password, purchaseState } from '../lib/rules';
 
 describe('redirecionamentos',()=>{
   it('mantém caminhos internos e seus parâmetros',()=>{
@@ -37,4 +38,13 @@ it('calcula médias e distribuições reais de 1 a 5',()=>{
 it('limita o comprimento em bytes para senhas Unicode',()=>{
   expect(password.safeParse('palavraf0rte').success).toBe(true);
   expect(password.safeParse('🔑'.repeat(19)).success).toBe(false);
+});
+
+it('aceita portfólio opcional e rejeita URLs inválidas sem lançar exceção',()=>{
+  const portfolio=z.union([httpsUrl.max(500),z.literal('')]);
+  expect(portfolio.safeParse('').success).toBe(true);
+  expect(portfolio.safeParse('https://example.com/portfolio').success).toBe(true);
+  expect(portfolio.safeParse('invalid-url').success).toBe(false);
+  expect(portfolio.safeParse('https://person@example.com').success).toBe(false);
+  expect(portfolio.safeParse('http://example.com').success).toBe(false);
 });

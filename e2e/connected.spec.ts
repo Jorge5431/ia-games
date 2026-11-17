@@ -191,7 +191,7 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     await buyerPage.goto('/game/'+slug);
     await buyerPage.getByLabel('Comentário').fill('Comentário do teste integrado');
     await buyerPage.getByRole('button',{name:'Publicar avaliação'}).click();
-    await expect(buyerPage.getByText('Comentário do teste integrado',{exact:true})).toBeVisible();
+    await expect(buyerPage.locator('p').filter({hasText:'Comentário do teste integrado'})).toBeVisible();
     await buyerPage.getByLabel('Nota').selectOption('4');
     await buyerPage.getByRole('button',{name:'Editar avaliação'}).click();
     await expect(buyerPage.getByText('1 avaliação',{exact:false})).toBeVisible();

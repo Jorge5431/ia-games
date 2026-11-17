@@ -12,10 +12,15 @@ export const uuid = z.uuid();
 export const email = z.email().max(254);
 export const password = z.string().min(8).max(72).refine(value => new TextEncoder().encode(value).length <= 72);
 export const slug = z.string().min(2).max(100).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
-export const httpsUrl = z.url({ protocol: /^https$/ }).refine(value => {
-  const url = new URL(value);
-  return !url.username && !url.password;
-});
+export const httpsUrl = z.string().refine(value => {
+  try {
+    const url = new URL(value);
+    return value === value.trim() && url.protocol === 'https:' && !url.username && !url.password;
+  } catch {
+    return false;
+  }
+}, 'Informe um endereço HTTPS válido.');
+
 export const textField = (max: number) => z.string().trim().max(max);
 export const gameStatuses = { draft:'Rascunho', pending:'Em análise', published:'Publicado', rejected:'Rejeitado' } as const;
 export const flags = Object.freeze({ realPayments: false, executableUpload: false, realFileDistribution: false });
