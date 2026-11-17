@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { cookies } from 'next/headers';
 import { parsePreferences, preferenceCookie } from '@/lib/preferences';
 import { PreferencesProvider } from '@/components/preferences-provider';
+import { Brand } from '@/components/brand';
 import { Navigation } from '@/components/navigation';
 import { session } from '@/lib/supabase';
 import { siteUrl } from '@/lib/config';
@@ -26,7 +27,7 @@ export default async function RootLayout({children}:Readonly<{children:React.Rea
     <Navigation signedIn={Boolean(current)}/>
     <main id="main">{children}</main>
     <footer className="footer"><div className="container footer-inner">
-      <div><Link className="brand" href="/">VORNELIX</Link><p className="muted">Gaming Reimagined</p></div>
+      <div><Brand/></div>
       <nav aria-label="Institucional"><Link href="/about">Sobre</Link><Link href="/support">Suporte</Link><Link href="/terms">Termos</Link><Link href="/privacy">Privacidade</Link></nav>
     </div></footer>
   </PreferencesProvider></body></html>;

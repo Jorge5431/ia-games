@@ -219,3 +219,19 @@ img{display:block}
 .hero-content p:not(.eyebrow),.section-heading p,.footer .brand + p{font-family:var(--support);font-weight:300;letter-spacing:-.015em}
 .hero-content p:not(.eyebrow){font-size:clamp(1.05rem,1.8vw,1.4rem);line-height:1.5}
 .brand{font-family:var(--display);font-weight:400;letter-spacing:.06em}
+
+/* Compact brand lockup matching the supplied reference. */
+.brand.brand-lockup{display:inline-flex;align-items:center;gap:10px;flex-shrink:0;letter-spacing:normal;text-align:left}
+.brand-symbol{display:block;width:40px;height:40px;flex:none}
+.brand-wordmark{display:flex;flex-direction:column;gap:5px}
+.brand-name{font-family:var(--body);font-size:20px;line-height:1;font-weight:800;letter-spacing:.12em;color:var(--text)}
+.brand-tagline{font-family:var(--body);font-size:8px;line-height:1.2;font-weight:700;letter-spacing:.18em;color:var(--muted)}
+@media(max-width:440px){
+  .header-inner{width:calc(100% - 1.5rem);gap:.35rem}
+  .site-header .brand-symbol{width:36px;height:36px}
+  .site-header .brand-name{font-size:17px}
+  .site-header .brand-tagline{font-size:6.8px}
+  .site-header .brand-lockup{gap:8px}
+  .site-header .header-actions{gap:2px}
+  .site-header .icon-button{padding-inline:.5rem}
+}

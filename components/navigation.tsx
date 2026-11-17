@@ -2,7 +2,7 @@
 import { useGentleMotion } from './preferences-provider';
 
 import Link from 'next/link';
-import Image from 'next/image';
+import { Brand } from './brand';
 import { usePathname } from 'next/navigation';
 import { Menu, Search, Settings2, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
@@ -22,10 +22,7 @@ export function Navigation({signedIn}: {signedIn:boolean}) {
 
   return <header className="site-header" onKeyDown={event => { if(event.key==='Escape') setOpenOn(null); }}>
     <div className="container header-inner">
-      <Link href="/" className="brand" aria-label="Vornelix — início">
-        <Image src="/simbolo-vornelix.webp" width={36} height={36} alt=""/>
-        <span>VORNELIX</span>
-      </Link>
+      <Brand/>
       <nav className="desktop-nav" aria-label="Navegação principal">{primary.map(([href,label]) =>
         <Link href={href} key={href} aria-current={path===href ? 'page' : undefined}>
           {label}{path===href && <motion.span className="nav-active" layoutId={reduced ? undefined:'nav-active'}/>}
