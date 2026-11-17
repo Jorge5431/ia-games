@@ -31,5 +31,11 @@ test('efeitos acompanham scroll e ficam imóveis em movimento reduzido',async({p
   await page.goto('/settings');
   await page.getByLabel('Movimento',{exact:true}).selectOption('reduced');
   await page.goto('/');
-  await expect.poll(()=>page.locator('.depth-ring').evaluate(el=>getComputedStyle(el).transform)).toBe('none');
+  const stationary=page.locator('.depth-ring');
+  const isIdentity=()=>stationary.evaluate(el=>new DOMMatrixReadOnly(getComputedStyle(el).transform).isIdentity);
+  await expect.poll(isIdentity).toBe(true);
+  await page.mouse.wheel(0,450);
+  await expect.poll(()=>page.evaluate(()=>window.scrollY)).toBeGreaterThan(0);
+  await page.waitForTimeout(300); // Allow scroll-linked animation frames to run.
+  expect(await isIdentity()).toBe(true);
 });
