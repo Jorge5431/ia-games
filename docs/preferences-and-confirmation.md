@@ -15,3 +15,11 @@ Código hospedado não pode interceptar `http://localhost:3000` no dispositivo d
 ## Validação
 
 Testes adicionados para cookie inválido, persistência de preferências após recarga, idioma da navegação, reset, proteção contra falsa confirmação e parallax com movimento reduzido. A suíte integrada de e-mail isolado exige a nova página e o botão de continuação antes de testar persistência da sessão. Nenhuma conta de produção foi criada para esses testes.
+
+## Auditoria de dependências — 17/11/2026
+
+- `npm audit --omit=dev --json`: 0 vulnerabilidades reportadas.
+- `npm audit --json`: 16 ocorrências high na cadeia de ferramentas de desenvolvimento (ESLint/Vitest/Vite), propagadas de picomatch.
+- Advisory GHSA-fc5q-39xc-vjpf: ReDoS por padrões extglob fornecidos pelo atacante; versões até 4.0.7 afetadas e nenhuma versão corrigida indicada na consulta de 17/11/2026. Fonte: https://github.com/advisories/GHSA-fc5q-39xc-vjpf
+- Não aplicar downgrade automático de Next/Vitest nem declarar auditoria integralmente limpa. Aguardar correção compatível e repetir auditoria/testes. Os glob patterns da aplicação não são fornecidos por usuários do marketplace; isso não elimina o alerta nas ferramentas.
+- CI anterior passou lint, typecheck, 21 testes unitários/banco, build e os testes integrados de autenticação em Supabase isolado. A asserção de movimento reduzido foi refinada para verificar matriz identidade antes e depois de rolar: Chrome pode serializar a transformação neutra como matriz em vez de `none`. O resultado final deve ser consultado no workflow associado ao commit.
