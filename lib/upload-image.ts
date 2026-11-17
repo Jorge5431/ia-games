@@ -2,7 +2,7 @@ import 'server-only';
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 
-const mimeTypes = {'image/png':'png','image/jpeg':'jpg','image/webp':'webp'} as const;
+import { allowedImageMimeTypes as mimeTypes, imageLimitBytes, imageLimitMb } from './image-limits';
 type Mime = keyof typeof mimeTypes;
 
 function matchesMime(data: Uint8Array, mime: Mime) {
@@ -13,9 +13,8 @@ function matchesMime(data: Uint8Array, mime: Mime) {
 }
 
 export async function uploadImage(client:SupabaseClient,bucket:'avatars'|'game-images',userId:string,value:FormDataEntryValue|null) {
-  const limit=bucket==='avatars'?5:10;
-  if(!(value instanceof File) || value.size<16 || value.size>limit*1024*1024 || !Object.hasOwn(mimeTypes,value.type)){
-    return {ok:false,error:'Selecione uma imagem JPEG, PNG ou WebP de até '+limit+' MB.'} as const;
+  if(!(value instanceof File) || value.size<16 || value.size>imageLimitBytes || !Object.hasOwn(mimeTypes,value.type)){
+    return {ok:false,error:'Selecione uma imagem JPEG, PNG ou WebP de até '+imageLimitMb+' MB.'} as const;
   }
   const mime=value.type as Mime;
   if(!matchesMime(new Uint8Array(await value.slice(0,12).arrayBuffer()),mime)) return {ok:false,error:'O conteúdo do arquivo não corresponde ao formato informado.'} as const;

@@ -5,13 +5,13 @@
 | Verificação | Resultado |
 | --- | --- |
 | `npm ci`, lint, TypeScript estrito e build de produção | Aprovados |
-| Regras de URL, senhas, compra, download e avaliações | 10 testes unitários aprovados |
+| Regras de URL, senhas, compra, download e avaliações | 11 testes unitários aprovados |
 | PostgreSQL isolado | 8 testes aprovados para trigger de perfil, papéis, RLS, Storage, publicação, avaliações, favoritos, aquisição e versões |
 | Playwright em Chromium headless | 11 testes aprovados para rotas, filtros, retorno após login, 404, menu, teclado, movimento reduzido, cinco tamanhos de tela e medição de renderização da home |
 | Dependências | `npm audit` encontrou zero vulnerabilidades |
 | Supabase hospedado | Duas migrations aplicadas e consultadas. Catálogo com zero jogos publicados e um perfil preexistente. Bucket de builds privado e sem políticas de objetos |
-| Auth hospedado | Confirmação, entrega SMTP e recuperação pendentes de validação em um site implantado |
-| Integração com Supabase local | Dois testes integrados Playwright com Auth, SMTP capturado, Data API e Storage foram incluídas. A execução local requer Docker, indisponível neste ambiente. Consulte os resultados de Actions no PR |
+| Auth hospedado | Cadastro por e-mail habilitado com confirmação obrigatória. Entrega SMTP e recuperação pendentes de validação em um site implantado |
+| Integração com Supabase local | Dois testes integrados Playwright com Auth, SMTP capturado, Data API e Storage foram incluídos. A execução local requer Docker, indisponível neste ambiente. Consulte os resultados de Actions no PR |
 
 A suíte Chromium testou desktop e emulação de dispositivos móveis. Esses resultados não medem desempenho de campo em Android ou iPhone. Os 60 FPS e Core Web Vitals de campo dependem de dados reais e de dispositivos físicos.
 

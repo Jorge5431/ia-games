@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { ImageField } from '@/components/image-field';
 import Link from 'next/link';
 import { ActionForm, Field } from '@/components/action-form';
 import { PortalShell } from '@/components/portal-shell';
@@ -23,7 +24,7 @@ export default async function Page({params}:{params:Promise<{id:string}>}) {
       return <div className="panel" key={kind}><h2>{title}</h2>
         {image && <Image src={image} alt={title} width={224} height={126}/>}
         {editable && (game.status==='draft'||kind==='screenshot') && <ActionForm action={editMedia.bind(null,id,kind)} label={label}>
-          <label className="field">Imagem JPEG, PNG ou WebP (até 10 MB)<input name="image" type="file" accept="image/jpeg,image/png,image/webp" required/></label>
+          <ImageField/>
         </ActionForm>}
       </div>;
     })}

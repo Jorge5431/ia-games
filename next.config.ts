@@ -3,7 +3,7 @@ import type { NextConfig } from 'next';
 const backend = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const remotePatterns = backend ? [new URL('/storage/v1/object/public/**', backend)] : [];
 const config: NextConfig = {
-  experimental: { authInterrupts: true, serverActions: { bodySizeLimit: '11mb' } },
+  experimental: { authInterrupts: true, serverActions: { bodySizeLimit: '4.25mb' } },
   images: { remotePatterns, dangerouslyAllowLocalIP: process.env.VORNELIX_LOCAL_TEST === '1' },
   async headers() {
     return [{ source: '/:path*', headers: [

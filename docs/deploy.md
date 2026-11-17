@@ -8,6 +8,8 @@
 4. Configure SMTP de produção, remetente e domínio verificados. Preserve a confirmação de e-mail. Use os modelos em `supabase/templates/` e confirme a entrega na caixa de destino. Esses modelos usam `SiteURL` e `TokenHash`, por isso cada instância de teste deve ter sua própria origem.
 5. Execute os controles de CI. Para confirmar produção depois do deploy, peça ao responsável para criar ou indicar uma conta autorizada e valide confirmação, recuperação e logout antes de convidar usuários.
 
+O limite de cada imagem é de 4 MB, com margem para o corpo multipart exigido pelas funções da Vercel.
+
 Variáveis de integração administrativa e testes pertencem apenas ao processo isolado de testes. Mantenha chaves administrativas fora do Vercel e da aplicação.
 
 ## Banco de dados

@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { ImageField } from '@/components/image-field';
 import { requireSession } from '@/lib/supabase';
 import { publicImage } from '@/lib/catalog';
 import { changeAvatar, updateProfile } from '@/lib/player-actions';
@@ -19,7 +20,7 @@ export default async function Page() {
       <Notes name="bio" label="Biografia" value={data.bio} maxLength={500}/>
     </ActionForm></div>
     <div className="panel"><h2>Avatar</h2>{avatar && <Image src={avatar} alt="Seu avatar" className="avatar" width={78} height={78}/>}
-      <ActionForm action={changeAvatar} label="Enviar avatar"><label className="field">Imagem (até 5 MB)<input name="image" type="file" accept="image/jpeg,image/png,image/webp" required/></label></ActionForm>
+      <ActionForm action={changeAvatar} label="Enviar avatar"><ImageField/></ActionForm>
     </div>
   </AccountShell>;
 }
