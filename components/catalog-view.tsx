@@ -1,18 +1,22 @@
 import { FallingText } from '@/components/falling-text';
 import Link from 'next/link';
 import { ArrowRight, Search } from 'lucide-react';
-import { catalog, filters, PAGE_SIZE, type Game, type Query } from '@/lib/catalog';
+import { catalog, filters, isDirectVideoUrl, PAGE_SIZE, type Game, type Query } from '@/lib/catalog';
 import { categories, platforms } from '@/lib/rules';
+import { db } from '@/lib/supabase';
 import { GameCard } from './game-card';
 
 export const emptyCatalogMessage = 'Novos universos estão sendo criados. Em breve, descubra os primeiros jogos da Vornelix.';
 
 export function Categories() {
-  return <div className="category-grid">{categories.map(([slug,label])=><Link href={'/category/'+slug} key={slug}>{label}<ArrowRight size={15}/></Link>)}</div>;
+  return <div className="category-grid panoramic-categories">{categories.map(([slug,label])=><Link href={'/category/'+slug} key={slug} className={'category-panorama category-'+slug}><span>{label}</span><ArrowRight size={15}/></Link>)}</div>;
 }
 
-export function GameGrid({games,tilt=false}: {games:Game[];tilt?:boolean}) {
-  return <div className="card-grid">{games.map((game,index)=><GameCard game={game} index={index} tilt={tilt && index < 4} key={game.id}/>)}</div>;
+export async function GameGrid({games,tilt=false}: {games:Game[];tilt?:boolean}) {
+  const client=games.length?await db():null;
+  const previews=new Map<string,string>();
+  if(client){const {data}=await client.from("game_media").select("game_id,media_url").eq("media_type","trailer").in("game_id",games.map(g=>g.id)).order("position").order("id");for(const item of data||[]){if(!previews.has(item.game_id)&&isDirectVideoUrl(item.media_url))previews.set(item.game_id,item.media_url);}}
+  return <div className="card-grid">{games.map((game,index)=><GameCard game={game} preview={previews.get(game.id)} index={index} tilt={tilt && index < 4} key={game.id}/>)}</div>;
 }
 
 export function Empty({title,children}: {title:string;children?:React.ReactNode}) {
