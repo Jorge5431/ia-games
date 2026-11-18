@@ -168,3 +168,11 @@ export async function reviewUpdate(id:string,approve:boolean,_previous:ActionSta
  if(error)return {error:'Não foi possível concluir a análise.'};
  revalidatePath('/','layout');return {success:'Decisão registrada.'};
 }
+
+export async function unpublishGame(id:string,_previous:ActionState,form:FormData):Promise<ActionState>{
+ if(!uuid.safeParse(id).success||form.get('confirm')!=='yes')return {error:'Confirme a remoção.'};
+ const {client}=await requireRole('developer','/developer/games');
+ const {error}=await client.rpc('unpublish_game',{p_id:id});
+ if(error)return {error:'Não foi possível remover o jogo. Verifique suas permissões.'};
+ revalidatePath('/','layout');return {success:'Jogo removido do catálogo.'};
+}
