@@ -101,11 +101,11 @@ export async function resendRegistration(_previous:ActionState,_form:FormData):P
 
 export async function recoverWithCode(_previous:ActionState,form:FormData):Promise<ActionState>{
  const jar=await cookies();
- const address=email.safeParse(jar.get('vornelix_recovery_email')?.value),pass=password.safeParse(form.get('password')),token=String(form.get('token')||'').trim();
+ const address=email.safeParse(jar.get('vornelix_recovery_email')?.value || form.get('email')),pass=password.safeParse(form.get('password')),token=String(form.get('token')||'').trim();
  if(!address.success||!pass.success||pass.data!==form.get('confirm')||!/^\d{6}$/.test(token))return {error:'Confira e-mail, código e as duas senhas.'};
  const client=await db();if(!client)return {error:'Autenticação indisponível.'};
- const {error}=await client.auth.verifyOtp({email:address.data,token,type:'recovery'});
- if(error)return {error:'Código inválido ou expirado. Solicite outro.'};
+ const {data,error}=await client.auth.verifyOtp({email:address.data,token,type:'recovery'});
+ if(error||!data.session||!data.user)return {error:'Código inválido ou expirado. Solicite outro.'};
  const result=await client.auth.updateUser({password:pass.data});
  await client.auth.signOut({scope:'local'});
  if(result.error)return {error:authError(result.error.code)+' Solicite um novo código.'};
