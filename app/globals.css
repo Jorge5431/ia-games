@@ -446,3 +446,14 @@ h2{letter-spacing:.005em}
 .publication-banner{min-height:210px;display:flex;flex-direction:column;justify-content:end;gap:.5rem;padding:1rem;background:radial-gradient(ellipse at top right,#762a10,#080808);background-size:cover;background-position:center;color:#fff}
 @media(max-width:800px){.publication-editor{grid-template-columns:minmax(0,1fr)}.publication-preview{position:static}.category-grid.panoramic-categories,.cinematic-catalog .category-grid.panoramic-categories{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:420px){.category-grid .category-panorama,.cinematic-catalog .category-grid .category-panorama{min-height:90px;padding:.6rem;font-size:.8rem}}
+
+/* Full bleed homepage, independent of generic container and hero rules */
+.immersive-home{width:100%;max-width:none;margin:0;padding:0;display:block;background:#080808;color:#fff;overflow:clip}
+.immersive-hero{position:relative;isolation:isolate;width:100%;height:100svh;min-height:420px;margin:0;padding:0;border:0;border-radius:0;box-shadow:none;overflow:hidden;background:#000}
+.immersive-art{position:absolute;inset:0;background:#000 url('/marca-vornelix.webp') center center/cover no-repeat;pointer-events:none}
+.immersive-fade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(0deg,#080808 0%,transparent 23%)}
+.immersive-scroll{position:absolute;bottom:clamp(1rem,5vh,3rem);left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.45rem;color:#fff;text-decoration:none;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;min-height:44px;text-shadow:0 2px 8px #000}
+.immersive-scroll svg{color:#ff6500}
+.immersive-home>.cinematic-catalog{background:#080808;color:#fff;margin:0;border:0;border-radius:0}
+.immersive-home .cinematic-empty,.immersive-home .cinematic-developer,.immersive-home .page-section{background:transparent;border:0;box-shadow:none;border-radius:0}
+@media(max-width:700px){.immersive-art{background-size:contain;background-position:center center}.immersive-hero{height:100svh}}
