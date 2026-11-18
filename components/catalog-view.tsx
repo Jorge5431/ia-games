@@ -1,3 +1,4 @@
+import { FallingText } from '@/components/falling-text';
 import Link from 'next/link';
 import { ArrowRight, Search } from 'lucide-react';
 import { catalog, filters, PAGE_SIZE, type Game, type Query } from '@/lib/catalog';
@@ -15,7 +16,7 @@ export function GameGrid({games,tilt=false}: {games:Game[];tilt?:boolean}) {
 }
 
 export function Empty({title,children}: {title:string;children?:React.ReactNode}) {
-  return <div className="empty"><h2>{title}</h2>{children && <div className="muted">{children}</div>}</div>;
+  return <div className="empty"><h2><FallingText text={title}/></h2>{children && <div className="muted">{children}</div>}</div>;
 }
 
 export async function CatalogView({title,params,categorySlug,path='/store'}: {title:string;params:Query;categorySlug?:string;path?:string}) {
@@ -33,7 +34,7 @@ export async function CatalogView({title,params,categorySlug,path='/store'}: {ti
     queryParams.set('page',String(page));
     return path+'?'+queryParams.toString();
   }
-  return <section className="container page"><h1>{title}</h1>
+  return <section className="container page"><h1><FallingText text={title}/></h1>
     <form action={path} className="panel">
       <div className="filter-grid">
         <label className="field">Pesquisar<input name="q" type="search" placeholder="Nome ou descrição" maxLength={80} defaultValue={query.q}/></label>
