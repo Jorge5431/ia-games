@@ -16,7 +16,8 @@ export const metadata: Metadata = {
   metadataBase: siteUrl(),
   title:{default:'VORNELIX | Gaming Reimagined',template:'%s | Vornelix'},
   description:'Descubra jogos criados com inteligência artificial na Vornelix.',
-  openGraph:{type:'website',locale:'pt_BR',siteName:'Vornelix',images:[{url:'/marca-vornelix.webp'}]},
+  twitter:{card:'summary_large_image',title:'VORNELIX | Gaming Reimagined',description:'Descubra jogos criados com inteligência artificial na Vornelix.',images:['/vornelix-hero-banner.webp']},
+  openGraph:{type:'website',locale:'pt_BR',siteName:'Vornelix',images:[{url:'/vornelix-hero-banner.webp',width:1536,height:864,alt:'VORNELIX — Gaming Reimagined'}]},
 };
 
 export default async function RootLayout({children}:Readonly<{children:React.ReactNode}>) {
