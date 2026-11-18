@@ -598,3 +598,10 @@ h2{letter-spacing:.005em}
 @keyframes vornelix-brand-sweep{0%{background-position:100% 50%}100%{background-position:0% 50%}}
 @media(prefers-reduced-motion:reduce){.brand .brand-name.brand-shimmer{animation:none;background:none;-webkit-text-fill-color:currentColor}}
 :root[data-motion=reduced] .brand .brand-name.brand-shimmer{animation:none;background:none;-webkit-text-fill-color:currentColor}
+
+/* Visible continuous sweep: the highlight crosses the entire wordmark. */
+.brand .brand-name.brand-shimmer{background-image:linear-gradient(105deg,var(--text) 0%,var(--text) 30%,#ff6500 42%,#fff 50%,#ffb05c 57%,var(--text) 70%,var(--text) 100%);background-size:220% 100%;animation:vornelix-brand-sweep-visible 2.6s linear infinite;filter:drop-shadow(0 0 2px #ff650044)}
+@keyframes vornelix-brand-sweep-visible{from{background-position:100% 50%}to{background-position:0% 50%}}
+.brand .brand-name.brand-shimmer::after{-webkit-text-fill-color:var(--accent)}
+@media(prefers-reduced-motion:reduce){.brand .brand-name.brand-shimmer{animation:none;background:none;-webkit-text-fill-color:currentColor;filter:none}}
+:root[data-motion=reduced] .brand .brand-name.brand-shimmer{animation:none;background:none;-webkit-text-fill-color:currentColor;filter:none}
