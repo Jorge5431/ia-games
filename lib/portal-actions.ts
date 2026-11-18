@@ -135,3 +135,20 @@ export async function registerVideo(id:string,path:string):Promise<ActionState>{
  if(error)return {error:'Não foi possível associar o vídeo.'};
  revalidatePath('/developer/games/'+id+'/media');return {success:'Vídeo salvo.'};
 }
+
+export async function requestUpdate(id:string,_previous:ActionState,form:FormData):Promise<ActionState>{
+ if(!uuid.safeParse(id).success)return {error:'Jogo inválido.'};
+ const {client}=await requireRole('developer','/developer/games/'+id+'/edit');
+ const parsed=z.object({title:textField(100).min(2),description:textField(15000).min(1),notes:textField(2000).min(1)}).safeParse(Object.fromEntries(form));
+ if(!parsed.success)return {error:'Preencha todos os campos.'};
+ const {error}=await client.from('game_updates').insert({game_id:id,...parsed.data});
+ if(error)return {error:'Não foi possível enviar. Confira se já existe uma atualização pendente.'};
+ revalidatePath('/developer/games/'+id+'/edit');return {success:'Atualização enviada. A versão publicada permanece disponível.'};
+}
+export async function reviewUpdate(id:string,approve:boolean,_previous:ActionState,_form:FormData):Promise<ActionState>{
+ if(!uuid.safeParse(id).success)return {error:'Atualização inválida.'};
+ const {client}=await requireRole('admin','/admin/moderation');
+ const {error}=await client.rpc('review_update',{p_id:id,p_approve:approve});
+ if(error)return {error:'Não foi possível concluir a análise.'};
+ revalidatePath('/','layout');return {success:'Decisão registrada.'};
+}
