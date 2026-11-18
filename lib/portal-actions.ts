@@ -42,7 +42,7 @@ export async function submitGame(id:string,_previous:ActionState,_form:FormData)
   redirect('/developer/submissions');
 }
 
-async function queueMedia(client:Awaited<ReturnType<typeof requireRole>>['client'],id:string,kind:'cover_url'|'banner_url'|'trailer',url:string){
+async function queueMedia(client:Awaited<ReturnType<typeof requireRole>>['client'],id:string,kind:'cover_url'|'banner_url'|'trailer'|'screenshot',url:string){
  const {data:g}=await client.from('games').select('title,description,developer_id').eq('id',id).single();
  if(!g)return {error:'Jogo indisponível.'};
  const {data:u,error}=await client.from('game_updates').insert({game_id:id,title:g.title,description:g.description,notes:'Alteração de mídia: '+kind,media_kind:kind,media_url:url}).select('id').single();
@@ -66,7 +66,7 @@ export async function editMedia(gameId:string,kind:'cover_url'|'banner_url'|'scr
     if(game.status==='rejected' && kind!=='screenshot') return {error:'Salve o jogo como rascunho antes de alterar a capa ou o banner.'};
     const image=await uploadImage(client,'game-images',user.id,form.get('image'));
     if(!image.ok) return {error:image.error};
-    if(game.status==='published'){if(kind==='screenshot')return {error:'Tipo indisponível.'};return queueMedia(client,gameId,kind,image.url);}
+    if(game.status==='published')return queueMedia(client,gameId,kind,image.url);
     const result=kind==='screenshot'
       ? await client.from('game_media').insert({game_id:gameId,media_type:'screenshot',media_url:image.url}).select('id').maybeSingle()
       : await client.from('games').update({[kind]:image.url}).eq('id',gameId).eq('developer_id',user.id).eq('status','draft').select('id').maybeSingle();
