@@ -479,3 +479,18 @@ h2{letter-spacing:.005em}
 @media(max-aspect-ratio:1/1){.immersive-art-image{background-size:100% auto}.immersive-embers{display:none}}
 @media(prefers-reduced-motion:reduce){.immersive-art-image,.immersive-scroll svg{animation:none!important}.immersive-embers{display:none}}
 :root[data-motion=reduced] .immersive-embers{display:none}
+
+/* Seamless panoramic hero: intrinsic artwork ratio, no letterboxing. */
+.immersive-home{--hero-overlap:clamp(48px,9vw,150px);background:#080808;isolation:isolate}
+.immersive-home .immersive-hero{height:auto;min-height:0;aspect-ratio:16/9;width:100%;background:#080808}
+.immersive-home .immersive-art-image{background-size:cover;background-position:center top;animation:immersive-art-reveal .85s ease-out both}
+@keyframes immersive-art-reveal{from{opacity:.65}to{opacity:1}}
+.immersive-home .immersive-fade{inset:auto 0 0;height:43%;background:linear-gradient(to bottom,transparent 0%,rgba(8,8,8,.12) 22%,rgba(8,8,8,.55) 58%,#080808 100%)}
+.immersive-home .immersive-fade::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 20% 90%,rgba(100,100,100,.10),transparent 52%),radial-gradient(ellipse at 75% 80%,rgba(100,100,100,.07),transparent 55%);mask-image:linear-gradient(transparent,#000 55%,transparent)}
+.home.immersive-home>.cinematic-catalog{position:relative;z-index:2;margin-top:calc(-1 * var(--hero-overlap));padding-top:0;background:transparent;scroll-margin-top:5rem}
+.immersive-home .cinematic-catalog>section:first-child{padding-top:0}
+.immersive-home .cinematic-catalog>section:first-child h2{text-shadow:0 2px 16px #000,0 2px 4px #000}
+.immersive-home .immersive-scroll{bottom:calc(var(--hero-overlap) + 1rem);left:auto;right:clamp(1rem,4vw,4rem);transform:none}
+@media(max-width:700px){.immersive-home{--hero-overlap:clamp(24px,8vw,56px)}.immersive-home .immersive-fade{height:50%}.immersive-home .immersive-scroll-wrap{display:none}.home.immersive-home>.cinematic-catalog{padding-inline:1rem}.immersive-home .cinematic-catalog>section:first-child h2{font-size:clamp(1.25rem,5vw,2rem)}}
+@media(prefers-reduced-motion:reduce){.immersive-home .immersive-art-image{animation:none}}
+:root[data-motion=reduced] .immersive-home .immersive-art-image{animation:none}
