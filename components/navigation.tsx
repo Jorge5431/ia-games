@@ -1,6 +1,7 @@
 'use client';
 import { useGentleMotion } from './preferences-provider';
 
+import { NotificationBell } from './notification-bell';
 import Link from 'next/link';
 import { Brand } from './brand';
 import { usePathname } from 'next/navigation';
@@ -30,7 +31,7 @@ export function Navigation({signedIn,profile}: {signedIn:boolean;profile?:{usern
           {label}{path===href && <motion.span className="nav-active" layoutId={reduced ? undefined:'nav-active'}/>}
         </Link>
       )}</nav>
-      <div className="header-actions">
+      <div className="header-actions">{signedIn&&<NotificationBell/>}
         {signedIn&&profile?<Link className="header-profile" href="/account" aria-label="Minha conta">{profile.avatar?<img src={profile.avatar} alt="" className="header-avatar"/>:<span className="header-avatar"><UserRound size={20}/></span>}<span className="header-profile-text"><strong>{profile.username}</strong>{profile.creator?<small><Crown size={12} style={{display:'inline',verticalAlign:'middle',marginRight:3}}/>CRIADOR</small>:profile.developer&&<small>DESENVOLVEDOR</small>}</span></Link>:<Link className="button secondary desktop-account" href={signedIn ? '/account' : '/login'}>{signedIn ? t('Minha conta','My account','Mi cuenta') : t('Entrar','Sign in','Entrar')}</Link>}
         <button className="icon-button mobile-toggle compact-menu-toggle" type="button" aria-label={open ? 'Fechar menu' : 'Abrir menu'} aria-expanded={open} aria-controls="mobile-navigation" onClick={toggle}>{open ? <X/> : <EllipsisVertical size={20}/>}</button>
       </div>
