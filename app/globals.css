@@ -591,3 +591,10 @@ h2{letter-spacing:.005em}
 .developer-ranking li a:hover{background:var(--surface)}
 :root[data-theme=light]{--home-banner:url('/vornelix-hero-light.webp'),url('/vornelix-hero-banner.webp');--bg:#fff}
 @media(prefers-color-scheme:light){:root[data-theme=system]{--home-banner:url('/vornelix-hero-light.webp'),url('/vornelix-hero-banner.webp');--bg:#fff}}
+
+/* Continuous brand light sweep, using a lightweight repeating motion timeline. */
+.brand .brand-portal{color:var(--text);background:transparent;flex-shrink:0;filter:drop-shadow(0 0 5px #ff650033)}
+.brand .brand-name.brand-shimmer{display:inline-block;color:var(--text);background-image:linear-gradient(110deg,var(--text) 0%,var(--text) 39%,#ff6500 47%,#fff4d9 50%,#ff9a4d 53%,var(--text) 61%,var(--text) 100%);background-size:300% 100%;background-position:100% 50%;background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:vornelix-brand-sweep 3.8s linear infinite}
+@keyframes vornelix-brand-sweep{0%{background-position:100% 50%}100%{background-position:0% 50%}}
+@media(prefers-reduced-motion:reduce){.brand .brand-name.brand-shimmer{animation:none;background:none;-webkit-text-fill-color:currentColor}}
+:root[data-motion=reduced] .brand .brand-name.brand-shimmer{animation:none;background:none;-webkit-text-fill-color:currentColor}
