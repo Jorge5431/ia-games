@@ -101,3 +101,13 @@ export async function moderateGame(id:string,_previous:ActionState,form:FormData
   revalidatePath('/','layout');
   return {success:'Decisão registrada.'};
 }
+
+export async function saveDelivery(id:string,_previous:ActionState,form:FormData):Promise<ActionState>{
+ if(!uuid.safeParse(id).success)return {error:'Jogo inválido.'};
+ const {client}=await requireRole('developer','/developer/games/'+id+'/edit');
+ const parsed=z.object({delivery_kind:z.enum(['web','html_zip','windows_zip']),source_url:z.string().max(1000).url().refine(v=>{try{const u=new URL(v);return u.protocol==='https:'&&!u.username&&!u.password;}catch{return false;}})}).safeParse(Object.fromEntries(form));
+ if(!parsed.success)return {error:'Informe um link HTTPS válido.'};
+ const {error}=await client.from('game_delivery_intake').upsert({game_id:id,...parsed.data,updated_at:new Date().toISOString()});
+ if(error)return {error:'Não foi possível salvar o link do jogo.'};
+ revalidatePath('/developer/games/'+id+'/edit');return {success:'Link salvo para análise.'};
+}
