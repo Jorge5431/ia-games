@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { ActionForm, Notes } from '@/components/action-form';
 import { PortalShell } from '@/components/portal-shell';
 import { requireRole } from '@/lib/supabase';
-import { moderateGame } from '@/lib/portal-actions';
+import { moderateGame, reviewUpdate } from '@/lib/portal-actions';
 import { gameDetailsFields, publicImage, type Game } from '@/lib/catalog';
 import { httpsUrl, money } from '@/lib/rules';
 
@@ -15,6 +15,7 @@ export default async function Page() {
   if(error) throw new Error('Não foi possível consultar a fila de moderação.');
   const games=data as unknown as (Game & {game_media:{id:string;media_url:string;media_type:string}[]})[];
   const {data:deliveries}=await client.from('game_delivery_intake').select('game_id,delivery_kind,source_url,package_path,entry_hint');
+  const {data:updates}=await client.from('game_updates').select('id,title,description,notes,game_id').eq('status','pending');
   return <PortalShell kind="admin" title="Moderação de jogos">
     {!games.length && <div className="panel"><p>Nenhum jogo aguardando análise.</p></div>}
     {games.map(game=>{
@@ -35,5 +36,5 @@ export default async function Page() {
         </ActionForm>
       </div>;
     })}
-  </PortalShell>;
+  <h2>Atualizações de jogos publicados</h2>{updates?.map(u=><section className="panel" key={u.id}><h3>{u.title}</h3><p>{u.description}</p><p>{u.notes}</p><ActionForm action={reviewUpdate.bind(null,u.id,true)} label="Aprovar atualização"/><ActionForm action={reviewUpdate.bind(null,u.id,false)} label="Rejeitar atualização"/></section>)}</PortalShell>;
 }
