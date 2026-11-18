@@ -537,3 +537,24 @@ h2{letter-spacing:.005em}
 @media(max-width:650px){.creator-invite .card-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:.65rem}.creator-card .creator-card-body{padding:.7rem}.creator-card .creator-card-body a{font-size:.75rem;padding-inline:.4rem}.creator-card .creator-card-art svg{width:30px;height:30px}.creator-apply .creator-steps{gap:1.25rem}}
 @media(max-width:350px){.creator-invite .card-grid{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.creator-invite .creator-card{transition:none}.creator-invite .creator-card:hover{transform:none}}
+
+/* Original cinematic genre artwork, shared optimized atlas with SVG fallback. */
+.category-grid.panoramic-categories .category-panorama{aspect-ratio:2.39/1;min-height:0;align-items:end;padding:clamp(.65rem,1.8vw,1.35rem);border:0;border-radius:4px;box-shadow:none;background:#101010}
+.category-grid.panoramic-categories .category-panorama::before{background-image:url('/vornelix-category-atlas.webp'),var(--category-art);background-size:300% 400%,cover;background-position:var(--genre-x,0%) var(--genre-y,0%),center;background-repeat:no-repeat;transition:transform .55s cubic-bezier(.22,1,.36,1)}
+.category-grid.panoramic-categories .category-panorama::after{background:linear-gradient(0deg,#080808e8, #08080845 45%,transparent 85%)}
+.category-grid.panoramic-categories .category-panorama span{font-size:clamp(.85rem,1.8vw,1.35rem);font-weight:800;letter-spacing:.06em;text-transform:uppercase;text-shadow:0 2px 8px #000}
+.category-grid.panoramic-categories .category-panorama:hover::before{transform:scale(1.06)}
+.category-grid.panoramic-categories .category-panorama:hover svg{color:#ff6500}
+.category-acao{--genre-x:0%;--genre-y:0%}
+.category-aventura{--genre-x:50%;--genre-y:0%}
+.category-rpg{--genre-x:100%;--genre-y:0%}
+.category-sobrevivencia{--genre-x:0%;--genre-y:33.333333333333336%}
+.category-terror{--genre-x:50%;--genre-y:33.333333333333336%}
+.category-estrategia{--genre-x:100%;--genre-y:33.333333333333336%}
+.category-simulacao{--genre-x:0%;--genre-y:66.66666666666667%}
+.category-corrida{--genre-x:50%;--genre-y:66.66666666666667%}
+.category-puzzle{--genre-x:100%;--genre-y:66.66666666666667%}
+.category-indie{--genre-x:0%;--genre-y:100%}
+.category-mundo-aberto{--genre-x:50%;--genre-y:100%}
+.category-multiplayer{--genre-x:100%;--genre-y:100%}
+@media(prefers-reduced-motion:reduce){.category-grid.panoramic-categories .category-panorama::before{transition:none}.category-grid.panoramic-categories .category-panorama:hover::before{transform:none}}
