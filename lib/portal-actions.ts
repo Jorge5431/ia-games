@@ -36,6 +36,9 @@ export async function submitGame(id:string,_previous:ActionState,_form:FormData)
   const {error}=await client.rpc('submit_game',{p_game_id:id});
   if(error) return {error:'Salve título, gênero, descrição e o arquivo ZIP ou link do jogo antes de enviar.'};
   revalidatePath('/developer','layout');
+  revalidatePath('/','layout');
+  const {data:published}=await client.from('games').select('status,slug').eq('id',id).maybeSingle();
+  if(published?.status==='published') redirect('/game/'+encodeURIComponent(published.slug));
   redirect('/developer/submissions');
 }
 
