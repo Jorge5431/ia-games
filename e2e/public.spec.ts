@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 const publicRoutes=[
-  ['/','Gaming Reimagined'],['/store','Loja'],['/discover','Descobrir jogos'],['/categories','Categorias'],
+  ['/','VORNELIX — Gaming Reimagined'],['/store','Loja'],['/discover','Descobrir jogos'],['/categories','Categorias'],
   ['/category/acao','Ação'],['/search','Pesquisar jogos'],['/about','Sobre a Vornelix'],['/support','Suporte'],
   ['/terms','Termos de uso'],['/privacy','Privacidade'],['/login','Entre na Vornelix'],['/register','Crie sua conta'],
   ['/forgot-password','Recupere sua senha'],
@@ -22,7 +22,9 @@ test('rotas públicas, metadados e ausência de erros JavaScript',async({page})=
 
 test('busca, filtros, limpeza e navegação à página de categoria',async({page})=>{
   await page.goto('/');
-  await page.getByRole('link',{name:'Pesquisar',exact:true}).click();
+  await page.getByRole('searchbox').fill('sobrevivência');
+  await page.getByRole('button',{name:'Pesquisar',exact:true}).click();
+  await expect(page).toHaveURL(/\/search\?q=/);
   await page.getByRole('searchbox').fill('sobrevivência');
   await page.getByLabel('Gênero').selectOption('sobrevivencia');
   await page.getByLabel('Plataforma').selectOption('Windows');
@@ -40,12 +42,14 @@ test('busca, filtros, limpeza e navegação à página de categoria',async({page
 
 test('rotas privadas encaminham para login com o retorno correto',async({page})=>{
   const protectedRoutes=['/account','/account/profile','/account/settings','/account/reviews','/account/purchases',
-    '/library','/wishlist','/downloads','/developer/apply','/developer/dashboard','/developer/games',
+    '/library','/wishlist','/downloads','/developer/dashboard','/developer/games',
     '/developer/games/new','/developer/submissions','/developer/analytics','/admin','/admin/users','/admin/developers',
     '/admin/games','/admin/moderation','/admin/reports','/admin/settings','/reset-password',
     '/checkout/10000000-0000-4000-8000-000000000001',
     '/developer/games/10000000-0000-4000-8000-000000000001/edit','/developer/games/10000000-0000-4000-8000-000000000001/media',
   ];
+  await page.goto('/developer/apply');
+  await expect(page.getByRole('link',{name:'Entrar ou criar conta'})).toHaveAttribute('href','/login?next=%2Fdeveloper%2Fapply');
   for(const route of protectedRoutes){
     await page.goto(route);
     await expect(page).toHaveURL('/login?next='+encodeURIComponent(route));
@@ -54,7 +58,8 @@ test('rotas privadas encaminham para login com o retorno correto',async({page})=
 
 test('link de confirmação inválido e página 404',async({page})=>{
   await page.goto('/auth/callback');
-  await expect(page.locator('#main').getByRole('alert')).toContainText('link expirou ou é inválido');
+  await expect(page.getByRole('heading',{name:'Entre para continuar'})).toBeVisible();
+  await expect(page.getByRole('heading',{name:'E-mail confirmado!'})).toHaveCount(0);
   await page.goto('/pagina-inexistente');
   await expect(page.getByRole('heading',{level:1})).toHaveText('Página não encontrada');
   await page.getByRole('link',{name:'Ir para a loja'}).click();
@@ -82,18 +87,18 @@ test('menu mobile, teclado e preferência por movimento reduzido',async({page,br
   await expect(page.getByRole('link',{name:'Pular para o conteúdo'})).toBeFocused();
   const touch=await mobile.newPage();
   await touch.goto('/');
-  await touch.getByRole('button',{name:'Abrir menu mobile'}).tap();
-  const navigation=touch.getByRole('navigation',{name:'Navegação mobile'});
+  await touch.getByRole('button',{name:'Abrir menu'}).tap();
+  const navigation=touch.getByRole('navigation',{name:'Menu de navegação'});
   await expect(navigation).toBeVisible();
   await touch.keyboard.press('Escape');
   await expect(navigation).toBeHidden();
-  await touch.getByRole('button',{name:'Abrir menu mobile'}).tap();
+  await touch.getByRole('button',{name:'Abrir menu'}).tap();
   await navigation.getByRole('link',{name:'Descobrir'}).tap();
   await expect(touch).toHaveURL('/discover');
   await expect(navigation).toBeHidden();
   await touch.goto('/');
-  const animationDuration=await touch.locator('.institution-art img').evaluate(element=>getComputedStyle(element).animationDuration);
-  expect(Number.parseFloat(animationDuration)).toBeLessThan(.01);
+  await expect(touch.locator('.immersive-embers')).toHaveCount(0);
+  expect(await touch.locator('.immersive-art').evaluate(el=>new DOMMatrixReadOnly(getComputedStyle(el).transform).isIdentity)).toBe(true);
   await mobile.close();
 });
 
