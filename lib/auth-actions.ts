@@ -70,7 +70,8 @@ export async function authenticate(kind: 'login' | 'register' | 'forgot' | 'rese
   if (!input.success || input.data !== values.confirm) return { error:'Use uma senha válida de pelo menos 8 caracteres e repita a mesma senha.' };
   const { error } = await current.client.auth.updateUser({password:input.data});
   if (error) return {error:authError(error.code)};
-  return {success:'Senha atualizada.'};
+  await current.client.auth.signOut({scope:'local'});
+  redirect('/login?senha=atualizada');
 }
 
 export async function signOut(_previous: ActionState, _form: FormData): Promise<ActionState> {
