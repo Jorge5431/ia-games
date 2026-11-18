@@ -150,7 +150,7 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     await cover.getByRole('button',{name:'Salvar imagem'}).click();
     await expect(cover.getByRole('status')).toHaveText('Imagem salva!');
     await expect(cover.getByRole('img',{name:'Prévia'})).toBeVisible();
-    await page.getByRole('link',{name:/Voltar para/}).click();
+    await page.getByRole('link',{name:'Voltar para publicação',exact:true}).click();
     const guestContext=await browser.newContext({reducedMotion:'reduce'});
     const guest=await guestContext.newPage();
     const hydrationErrors:string[]=[];
