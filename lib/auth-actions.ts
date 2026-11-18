@@ -44,7 +44,7 @@ export async function authenticate(kind: 'login' | 'register' | 'forgot' | 'rese
     const { displayName, email, password, confirm } = input.data;
     if (password !== confirm) return { error:'As senhas precisam ser iguais.' };
     const callback = new URL('/auth/callback', siteUrl());
-    callback.searchParams.set('next', next);
+    callback.searchParams.set('next', '/account');
     const { data, error } = await client.auth.signUp({
       email, password, options:{ emailRedirectTo:callback.toString(), data:{ display_name:displayName, terms_accepted_at:new Date().toISOString() } },
     });
