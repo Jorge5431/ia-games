@@ -1,3 +1,4 @@
+import { FallingText } from '@/components/falling-text';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
@@ -33,9 +34,9 @@ export default async function Home({searchParams}:{searchParams:Promise<{code?:s
     <Hero slides={slides}/>
     {recent.offline ? <Empty title="Catálogo indisponível">Tente novamente em instantes.</Empty> : !recent.count ? <Empty title="O catálogo estreia em breve">{emptyCatalogMessage}</Empty> :
       shelves.map(([title,href,games])=>games.length>0 && <section className="page-section" key={title}>
-        <div className="section-title"><h2>{title}</h2><Link className="text-link" href={href}>Ver todos</Link></div><GameGrid games={games} tilt={href==='/store'}/>
+        <div className="section-title"><h2><FallingText text={title}/></h2><Link className="text-link" href={href}>Ver todos</Link></div><GameGrid games={games} tilt={href==='/store'}/>
       </section>)}
-    <section className="page-section"><h2>Explore por categoria</h2><Categories/></section>
-    <section className="panel"><h2>Cria jogos com IA?</h2><p className="muted">Solicite acesso ao portal para preparar seu jogo e enviá-lo para análise.</p><div><Button asChild variant="secondary"><Link href="/developer/apply">Tornar-se desenvolvedor<ArrowRight size={17}/></Link></Button></div></section>
+    <section className="page-section"><h2><FallingText text={"Explore por categoria"}/></h2><Categories/></section>
+    <section className="panel"><h2><FallingText text={"Cria jogos com IA?"}/></h2><p className="muted">Solicite acesso ao portal para preparar seu jogo e enviá-lo para análise.</p><div><Button asChild variant="secondary"><Link href="/developer/apply">Tornar-se desenvolvedor<ArrowRight size={17}/></Link></Button></div></section>
   </div>;
 }
