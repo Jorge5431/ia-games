@@ -1,3 +1,4 @@
+import { FallingText } from '@/components/falling-text';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Star } from 'lucide-react';
@@ -72,13 +73,13 @@ export default async function Page({params}:Props) {
       <div className="page-section detail-main-column">
         <Gallery images={screenshots} title={game.title}/>
         {trailers.length>0 && <section className="toolbar detail-reveal">{trailers.map((item,index)=><a key={item.id} className="button secondary" href={item.media_url} target="_blank" rel="noopener noreferrer">Assistir ao trailer{trailers.length>1?' '+(index+1):''}</a>)}</section>}
-        {game.description && <section className="panel detail-reveal"><h2>Sobre o jogo</h2><p className="preformatted">{game.description}</p></section>}
-        {(game.minimum_requirements||game.recommended_requirements) && <section className="panel detail-reveal"><h2>Requisitos do sistema</h2>
-          {game.minimum_requirements && <><h3>Mínimos</h3><p className="preformatted">{game.minimum_requirements}</p></>}
-          {game.recommended_requirements && <><h3>Recomendados</h3><p className="preformatted">{game.recommended_requirements}</p></>}
+        {game.description && <section className="panel detail-reveal"><h2><FallingText text={"Sobre o jogo"}/></h2><p className="preformatted">{game.description}</p></section>}
+        {(game.minimum_requirements||game.recommended_requirements) && <section className="panel detail-reveal"><h2><FallingText text={"Requisitos do sistema"}/></h2>
+          {game.minimum_requirements && <><h3><FallingText text={"Mínimos"}/></h3><p className="preformatted">{game.minimum_requirements}</p></>}
+          {game.recommended_requirements && <><h3><FallingText text={"Recomendados"}/></h3><p className="preformatted">{game.recommended_requirements}</p></>}
         </section>}
-        {game.ai_disclosure && <section className="panel detail-reveal"><h2>Uso de inteligência artificial</h2><p className="preformatted">{game.ai_disclosure}</p></section>}
-        <section className="panel detail-reveal"><h2>Avaliações</h2>
+        {game.ai_disclosure && <section className="panel detail-reveal"><h2><FallingText text={"Uso de inteligência artificial"}/></h2><p className="preformatted">{game.ai_disclosure}</p></section>}
+        <section className="panel detail-reveal"><h2><FallingText text={"Avaliações"}/></h2>
           <p className="rating"><Star size={18}/>{stats.average===null?'Sem avaliações':stats.average.toFixed(1).replace('.',',')+' · '+stats.count+(stats.count===1?' avaliação':' avaliações')}</p>
           {stats.count>0 && <ul className="muted">{stats.distribution.map((quantity,index)=><li key={index}>{index+1} {index===0?'estrela':'estrelas'} · {quantity}</li>).reverse()}</ul>}
           {owned && <ReviewForm gameId={game.id} review={ownReview?.data as Review|undefined} path={path}/>}
@@ -86,7 +87,7 @@ export default async function Page({params}:Props) {
         </section>
       </div>
       <aside className="panel detail-sidebar">
-        <h2>Informações</h2>
+        <h2><FallingText text={"Informações"}/></h2>
         {current ? <ActionForm action={updateWishlist.bind(null,game.id,!wish?.data,path)} label={wish?.data?'Remover dos favoritos':'Adicionar aos favoritos'} secondary/> :
           <Link className="button secondary" href={'/login?next='+encodeURIComponent(path)}>Adicionar aos favoritos</Link>}
         {!owned&&<Link className="button secondary" href={'/downloads?game='+game.id}>Download</Link>}
@@ -94,6 +95,6 @@ export default async function Page({params}:Props) {
         <dl>{detailFields.filter(([,value])=>value).map(([label,value])=><div key={label} className="row"><dt className="muted">{label}</dt><dd>{value}</dd></div>)}</dl>
       </aside>
     </div>
-    {relatedGames.length>0 && <section className="page-section detail-reveal"><h2>Jogos relacionados</h2><GameGrid games={relatedGames}/></section>}
+    {relatedGames.length>0 && <section className="page-section detail-reveal"><h2><FallingText text={"Jogos relacionados"}/></h2><GameGrid games={relatedGames}/></section>}
   </article>;
 }
