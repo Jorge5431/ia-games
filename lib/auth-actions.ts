@@ -1,5 +1,6 @@
 'use server';
 
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { db, requireSession } from './supabase';
@@ -50,7 +51,8 @@ export async function authenticate(kind: 'login' | 'register' | 'forgot' | 'rese
     });
     if (error) return { error:authError(error.code) };
     if (data.session) redirect(next);
-    return { success:'Se o cadastro puder ser confirmado, você receberá as instruções por e-mail. Se já tiver conta, entre ou recupere sua senha.' };
+    (await cookies()).set('vornelix_pending_email',email,{httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'lax',path:'/',maxAge:3600});
+    redirect('/verify-email');
   }
 
   if (kind === 'forgot') {
@@ -77,4 +79,20 @@ export async function signOut(_previous: ActionState, _form: FormData): Promise<
   const {error} = await client.auth.signOut({scope:'local'});
   if (error) return {error:'Não foi possível sair da conta.'};
   redirect('/');
+}
+
+export async function verifyRegistration(_previous:ActionState,form:FormData):Promise<ActionState>{
+ const jar=await cookies(); const address=jar.get('vornelix_pending_email')?.value;
+ const token=String(form.get('token')||'').trim();
+ if(!address||!/^\d{6}$/.test(token))return {error:'Informe os seis dígitos recebidos por e-mail.'};
+ const client=await db(); if(!client)return {error:'Autenticação indisponível.'};
+ const {data,error}=await client.auth.verifyOtp({email:address,token,type:'email'});
+ if(error||!data.user?.email_confirmed_at)return {error:'Código inválido ou expirado. Confira ou solicite outro.'};
+ jar.delete('vornelix_pending_email'); redirect('/auth/confirmed?next=%2Faccount');
+}
+export async function resendRegistration(_previous:ActionState,_form:FormData):Promise<ActionState>{
+ const address=(await cookies()).get('vornelix_pending_email')?.value;
+ const client=await db(); if(!address||!client)return {error:'Reinicie o cadastro.'};
+ const {error}=await client.auth.resend({type:'signup',email:address});
+ return error?{error:'Não foi possível reenviar. Aguarde e tente novamente.'}:{success:'Se houver confirmação pendente, um novo código será enviado.'};
 }
