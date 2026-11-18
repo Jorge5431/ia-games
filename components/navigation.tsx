@@ -38,6 +38,8 @@ export function Navigation({signedIn,profile}: {signedIn:boolean;profile?:{usern
     <AnimatePresence initial={false}>{open && <motion.nav id="mobile-navigation" className="mobile-nav compact-menu" aria-label="Menu de navegação"
       initial={reduced ? false : {opacity:0,y:-8}} animate={{opacity:1,y:0}} exit={reduced ? undefined : {opacity:0,y:-8}} transition={{duration:.18}}>
       {primary.map(([href,label]) => <Link key={href} href={href} onClick={() => setOpenOn(null)} aria-current={path===href ? 'page' : undefined}>{label}</Link>)}
+      {profile?.creator&&<Link href="/admin" onClick={()=>setOpenOn(null)}><Crown size={17}/> Painel do Criador</Link>}
+      {(profile?.developer||profile?.creator)&&<Link href="/developer/dashboard" onClick={()=>setOpenOn(null)}>Painel do Desenvolvedor</Link>}
       <Link href="/settings" onClick={() => setOpenOn(null)}><Settings2 size={17}/> {t("Configurações","Settings","Configuración")}</Link>
       {path!=="/"&&<Link href="/search" onClick={() => setOpenOn(null)}><Search size={17}/> {t("Pesquisar","Search","Buscar")}</Link>}
       <Link href={signedIn ? '/account' : '/login'} onClick={() => setOpenOn(null)}>{signedIn ? t('Minha conta','My account','Mi cuenta') : t('Entrar','Sign in','Entrar')}</Link>
