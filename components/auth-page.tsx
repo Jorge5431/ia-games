@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { authenticate } from '@/lib/auth-actions';
+import { authenticate, recoverWithCode } from '@/lib/auth-actions';
 import { nextPath } from '@/lib/rules';
 import { requireSession } from '@/lib/supabase';
 import { ActionForm, Field } from './action-form';
@@ -24,7 +24,7 @@ export async function AuthPage({kind, query}: {kind:keyof typeof titles; query:P
       {kind === 'reset' && <Field name="confirm" label="Confirme a senha" type="password" autoComplete="new-password" required/>}
       {kind === 'register' && <label className="check"><input name="terms" type="checkbox" required/><span>Li e aceito os <Link href="/terms" target="_blank">termos de uso</Link>.</span></label>}
     </ActionForm>
-    <div className="auth-links">
+    {kind==="forgot"&&<><h2>Já recebeu um código?</h2><ActionForm action={recoverWithCode} label="Redefinir com código"><Field name="email" label="E-mail" type="email" required/><Field name="token" label="Código de seis dígitos" required max={6}/><Field name="password" label="Nova senha" type="password" min={8} required/><Field name="confirm" label="Confirme a senha" type="password" required/></ActionForm></>}<div className="auth-links">
       {kind === 'login' ? <><Link href={'/register?next='+encodeURIComponent(next)}>Criar conta</Link><Link href="/forgot-password">Esqueci minha senha</Link></> : <Link href={'/login?next='+encodeURIComponent(next)}>Ir para o login</Link>}
     </div>
   </div></section>;
