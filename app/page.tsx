@@ -2,12 +2,11 @@ import { FallingText } from '@/components/falling-text';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
-import { catalog, filters, publicImage } from '@/lib/catalog';
-import { Hero, type Slide } from '@/components/hero';
+import { catalog, filters } from '@/lib/catalog';
+import { Hero } from '@/components/hero';
 import { Button } from '@/components/ui/button';
 import { Categories, GameGrid, emptyCatalogMessage } from '@/components/catalog-view';
 
-const institutional: Slide = {title:'Gaming Reimagined',summary:'Uma nova loja para descobrir jogos criados com inteligência artificial.',href:'/store',image:null};
 
 export default async function Home({searchParams}:{searchParams:Promise<{code?:string}>}) {
   const params=await searchParams;
@@ -17,10 +16,6 @@ export default async function Home({searchParams}:{searchParams:Promise<{code?:s
     catalog(filters({price:'free'}),4),catalog(filters({price:'paid'}),4),
     catalog(filters({order:'popular',rating:'1'}),4),
   ]);
-  const featured=recent.games.filter(game=>game.slug && publicImage(game.banner_url || game.cover_url)).slice(0,4);
-  const slides:Slide[]=[institutional,...featured.map(game=>({
-    title:game.title,summary:game.short_description||'',href:'/game/'+encodeURIComponent(game.slug!),image:publicImage(game.banner_url||game.cover_url),
-  }))];
   const recommendations = recent.games.filter(game=>!top.games.some(ranked=>ranked.id===game.id)).slice(4,8);
   const shelves=[
     ['Lançamentos recentes','/store',recent.games],
@@ -30,8 +25,8 @@ export default async function Home({searchParams}:{searchParams:Promise<{code?:s
     ['Jogos pagos','/store?price=paid',paid.games],
     ['Jogos para descobrir','/discover',recommendations],
   ] as const;
-  return <div className="container home">
-    <Hero slides={slides}/>
+  return <div className="home immersive-home">
+    <Hero/>
     <div id="home-catalog" className="cinematic-catalog">
     {recent.offline ? <section className="cinematic-empty"><h2><FallingText text="Catálogo indisponível"/></h2><p>Tente novamente em instantes.</p></section> : !recent.count ? <section className="cinematic-empty"><p className="eyebrow">Em breve</p><h2><FallingText text="Novos universos estão chegando"/></h2><p>{emptyCatalogMessage}</p></section> :
       shelves.map(([title,href,games])=>games.length>0 && <section className="page-section" key={title}>
