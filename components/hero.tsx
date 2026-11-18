@@ -1,4 +1,5 @@
 'use client';
+import { FallingText } from '@/components/falling-text';
 import { useGentleMotion } from './preferences-provider';
 
 import Image from 'next/image';
@@ -62,8 +63,8 @@ export function Hero({ slides }: {slides:Slide[]}) {
       <AnimatePresence initial={false} mode="wait"><motion.div key={slide.title}
         initial={reduced ? false : {opacity:0,y:12}} animate={{opacity:1,y:0}} exit={reduced ? undefined : {opacity:0,y:-6}} transition={{duration:.2}}>
         {(rotating || slide.image) && <p className="eyebrow">Em destaque</p>}
-        <h1>{slide.title}</h1>
-        <p>{slide.summary}</p>
+        <h1><FallingText text={slide.title}/></h1>
+        <p><FallingText text={slide.summary} subtle/></p>
         <Link className="button" href={slide.href}>{slide.href==='/store' ? 'Explorar loja' : 'Ver detalhes'}<ArrowRight size={18}/></Link>
       </motion.div></AnimatePresence>
       {rotating && <div className="hero-controls" aria-label="Controles do banner">
