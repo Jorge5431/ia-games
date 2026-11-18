@@ -6,13 +6,15 @@ import { Brand } from './brand';
 import { usePathname } from 'next/navigation';
 import { Menu, Search, Settings2, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLabel } from './preferences-provider';
 
 
 
 export function Navigation({signedIn}: {signedIn:boolean}) {
   const path = usePathname();
+  const [scrolled,setScrolled]=useState(false);
+  useEffect(()=>{const update=()=>setScrolled(window.scrollY>48);update();window.addEventListener('scroll',update,{passive:true});return()=>window.removeEventListener('scroll',update);},[]);
   const t=useLabel();
   const primary=[['/store',t('Loja','Store','Tienda')],['/discover',t('Descobrir','Discover','Descubrir')],['/categories',t('Categorias','Categories','Categorías')]];
   const [openOn,setOpenOn] = useState<string|null>(null);
@@ -20,7 +22,7 @@ export function Navigation({signedIn}: {signedIn:boolean}) {
   const open = openOn === path;
   const toggle = () => setOpenOn(open ? null : path);
 
-  return <header className="site-header" onKeyDown={event => { if(event.key==='Escape') setOpenOn(null); }}>
+  return <header className={`site-header${path==='/'?' cinematic-header':''}${scrolled?' is-scrolled':''}`} onKeyDown={event => { if(event.key==='Escape') setOpenOn(null); }}>
     <div className="container header-inner">
       <Brand/>
       <nav className="desktop-nav" aria-label="Navegação principal">{primary.map(([href,label]) =>
