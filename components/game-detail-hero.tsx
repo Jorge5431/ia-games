@@ -1,4 +1,5 @@
 'use client';
+import { FallingText } from '@/components/falling-text';
 
 import Image from 'next/image';
 import { motion } from 'motion/react';
@@ -58,7 +59,7 @@ export function GameDetailHero({title,genre,description,cover,poster,gameplay,ra
       </motion.div>
       <motion.div className="detail-heading" initial={reduced?false:{opacity:0,y:18}} animate={{opacity:1,y:0}} transition={{duration:.45,delay:.08}}>
         {genre&&<p className="eyebrow">{genre}</p>}
-        <h1>{title}</h1>
+        <h1><FallingText text={title}/></h1>
         {description&&<p className="detail-summary">{description}</p>}
         <div className="detail-quick-meta">
           <span className="rating">{rating}</span>
