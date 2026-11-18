@@ -457,3 +457,10 @@ h2{letter-spacing:.005em}
 .immersive-home>.cinematic-catalog{background:#080808;color:#fff;margin:0;border:0;border-radius:0}
 .immersive-home .cinematic-empty,.immersive-home .cinematic-developer,.immersive-home .page-section{background:transparent;border:0;box-shadow:none;border-radius:0}
 @media(max-width:700px){.immersive-art{background-size:contain;background-position:center center}.immersive-hero{height:100svh}}
+
+/* Preserve the original 16:9 artwork without cropping its wordmark. */
+.immersive-art{background-color:#000;background-size:contain;background-position:center center;background-repeat:no-repeat}
+.immersive-hero{height:100svh;min-height:0}
+.immersive-fade{background:linear-gradient(0deg,#080808 0%,transparent 12%)}
+@media (max-aspect-ratio: 1/1){.immersive-art{background-size:100% auto}.immersive-scroll{bottom:max(1.5rem,env(safe-area-inset-bottom))}}
+@media (prefers-reduced-motion:reduce){.immersive-art{transform:none!important;opacity:1!important}}
