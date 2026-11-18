@@ -25,6 +25,7 @@ export async function saveGame(id:string|null,_previous:ActionState,form:FormDat
   if(error||!data) return {error:error?.code==='23505'?'Este endereço de jogo já existe. Escolha outro.':'Não foi possível salvar o rascunho.'};
   revalidatePath('/developer','layout');
   if(!id) redirect('/developer/games/'+data.id+'/edit');
+  if(form.get('intent')==='submit') return submitGame(id,_previous,form);
   return {success:'Rascunho salvo.'};
 }
 
