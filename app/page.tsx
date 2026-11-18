@@ -5,7 +5,7 @@ import { ArrowRight } from 'lucide-react';
 import { catalog, filters, publicImage } from '@/lib/catalog';
 import { Hero, type Slide } from '@/components/hero';
 import { Button } from '@/components/ui/button';
-import { Categories, Empty, GameGrid, emptyCatalogMessage } from '@/components/catalog-view';
+import { Categories, GameGrid, emptyCatalogMessage } from '@/components/catalog-view';
 
 const institutional: Slide = {title:'Gaming Reimagined',summary:'Uma nova loja para descobrir jogos criados com inteligência artificial.',href:'/store',image:null};
 
@@ -32,11 +32,13 @@ export default async function Home({searchParams}:{searchParams:Promise<{code?:s
   ] as const;
   return <div className="container home">
     <Hero slides={slides}/>
-    {recent.offline ? <Empty title="Catálogo indisponível">Tente novamente em instantes.</Empty> : !recent.count ? <Empty title="O catálogo estreia em breve">{emptyCatalogMessage}</Empty> :
+    <div id="home-catalog" className="cinematic-catalog">
+    {recent.offline ? <section className="cinematic-empty"><h2><FallingText text="Catálogo indisponível"/></h2><p>Tente novamente em instantes.</p></section> : !recent.count ? <section className="cinematic-empty"><p className="eyebrow">Em breve</p><h2><FallingText text="Novos universos estão chegando"/></h2><p>{emptyCatalogMessage}</p></section> :
       shelves.map(([title,href,games])=>games.length>0 && <section className="page-section" key={title}>
         <div className="section-title"><h2><FallingText text={title}/></h2><Link className="text-link" href={href}>Ver todos</Link></div><GameGrid games={games} tilt={href==='/store'}/>
       </section>)}
     <section className="page-section"><h2><FallingText text={"Explore por categoria"}/></h2><Categories/></section>
-    <section className="panel"><h2><FallingText text={"Cria jogos com IA?"}/></h2><p className="muted">Solicite acesso ao portal para preparar seu jogo e enviá-lo para análise.</p><div><Button asChild variant="secondary"><Link href="/developer/apply">Tornar-se desenvolvedor<ArrowRight size={17}/></Link></Button></div></section>
+    <section className="cinematic-developer"><h2><FallingText text={"Cria jogos com IA?"}/></h2><p className="muted">Solicite acesso ao portal para preparar seu jogo e enviá-lo para análise.</p><div><Button asChild variant="secondary"><Link href="/developer/apply">Tornar-se desenvolvedor<ArrowRight size={17}/></Link></Button></div></section>
+    </div>
   </div>;
 }
