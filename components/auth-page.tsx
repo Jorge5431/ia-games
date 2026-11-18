@@ -13,8 +13,8 @@ export async function AuthPage({kind, query}: {kind:keyof typeof titles; query:P
   if (kind === 'reset') await requireSession('/reset-password');
   const next = nextPath(params.next);
   return <section className="auth-shell"><div className="panel auth-panel">
-    <h1>{titles[kind]}</h1>
-    {params.erro === 'link' && <p role="alert" className="feedback error">O link expirou ou é inválido. Solicite um novo link.</p>}
+    <h1>{titles[kind]}</h1>{params.senha==='atualizada'&&<p className="feedback success">Senha atualizada! Entre com sua nova senha.</p>}{kind==='forgot'&&<p className="muted">Informe seu e-mail. Abra o link recebido no mesmo navegador em que solicitou a recuperação. Confira também o spam.</p>}
+    {params.erro === 'link' && <p role="alert" className="feedback error">O link expirou ou é inválido. Solicite um novo link. <Link href="/forgot-password">Recuperar senha</Link></p>}
     <ActionForm action={authenticate.bind(null,kind)} label={labels[kind]}>
       <input type="hidden" name="next" value={next}/>
       {kind === 'register' && <Field name="displayName" label="Nome de exibição" autoComplete="nickname" max={60} required/>}
