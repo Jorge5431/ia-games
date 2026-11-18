@@ -1,3 +1,4 @@
+import { FallingText } from '@/components/falling-text';
 import Link from 'next/link';
 
 export function Brand() {
@@ -8,6 +9,6 @@ export function Brand() {
       <path d="m14 12 6 13 6-13" fill="none" stroke="#080808" strokeWidth="1.15" strokeLinejoin="round"/>
       <path d="m25.2 9.5 5.8 0L18.3 31.2l-2.7-4.4Z" className="brand-symbol-cut"/>
     </svg>
-    <span className="brand-wordmark"><span className="brand-name">VORNELIX</span><span className="brand-tagline">GAMING REIMAGINED</span></span>
+    <span className="brand-wordmark"><span className="brand-name"><FallingText text="VORNELIX"/></span><span className="brand-tagline"><FallingText text="GAMING REIMAGINED" subtle/></span></span>
   </Link>;
 }
