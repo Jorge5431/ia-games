@@ -1,11 +1,12 @@
 'use client';
 import { motion,useScroll,useTransform } from 'motion/react';
 import { useRef } from 'react';
-import { useGentleMotion } from './preferences-provider';
+import { usePreferences } from './preferences-provider';
 
 export function DepthBackdrop(){
   const ref=useRef<HTMLDivElement>(null);
-  const reduced=useGentleMotion();
+  const {preferences}=usePreferences();
+  const reduced=preferences.motion==='reduced';
   const {scrollYProgress}=useScroll({target:ref,offset:['start end','end start']});
   const near=useTransform(scrollYProgress,[0,1],[65,-65]);
   const far=useTransform(scrollYProgress,[0,1],[-30,30]);

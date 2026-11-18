@@ -20,6 +20,23 @@ export const httpsUrl = z.string().refine(value => {
     return false;
   }
 }, 'Informe um endereço HTTPS válido.');
+export const gameVideoUrl = httpsUrl.max(500).refine(value=>{
+  try {
+    const url=new URL(value);
+    const host=url.hostname.toLowerCase();
+    const direct=/\.(mp4|webm)$/i.test(url.pathname);
+    const youtubeHosts=['youtube.com','www.youtube.com','m.youtube.com'];
+    const youtube=youtubeHosts.includes(host)&&(
+      url.pathname==='/watch'&&/^\?v=[a-z0-9_-]{6,}(?:&[^#]*)?$/i.test(url.search)||
+      /^\/(embed|shorts)\/[a-z0-9_-]{6,}$/i.test(url.pathname)
+    );
+    const shortYoutube=host==='youtu.be'&&/^\/[a-z0-9_-]{6,}$/i.test(url.pathname);
+    const vimeo=(host==='vimeo.com'||host==='www.vimeo.com')&&/^\/[0-9]+$/.test(url.pathname);
+    return direct||youtube||shortYoutube||vimeo;
+  } catch {
+    return false;
+  }
+},'Use um link de YouTube, Vimeo ou um arquivo MP4/WebM direto.');
 
 export const textField = (max: number) => z.string().trim().max(max);
 export const gameStatuses = { draft:'Rascunho', pending:'Em análise', published:'Publicado', rejected:'Rejeitado' } as const;

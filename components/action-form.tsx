@@ -23,13 +23,13 @@ export function ActionForm({ action, label, children, className, secondary }: {
   </form>;
 }
 
-export function Field({ name, label, type = 'text', value, required, min, max, autoComplete }: {
+export function Field({ name, label, type = 'text', value, required, min, max, autoComplete, placeholder }: {
   name: string; label: string; type?: string; value?: string | number | null;
-  required?: boolean; min?: number; max?: number; autoComplete?: string;
+  required?: boolean; min?: number; max?: number; autoComplete?: string; placeholder?: string;
 }) {
   return <label className="field">{label}<input name={name} type={type} defaultValue={value ?? undefined}
     required={required} minLength={type !== 'number' ? min : undefined} maxLength={type !== 'number' ? max : undefined}
-    min={type === 'number' ? min : undefined} step={type === 'number' ? '.01' : undefined} autoComplete={autoComplete}/></label>;
+    min={type === 'number' ? min : undefined} step={type === 'number' ? '.01' : undefined} autoComplete={autoComplete} placeholder={placeholder}/></label>;
 }
 
 export function Notes({ name, label, value, maxLength = 2000, required = false }: {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { calculateRatings, downloadState, httpsUrl, nextPath, password, purchaseState } from '../lib/rules';
+import { calculateRatings, downloadState, gameVideoUrl, httpsUrl, nextPath, password, purchaseState } from '../lib/rules';
 
 describe('redirecionamentos',()=>{
   it('mantém caminhos internos e seus parâmetros',()=>{
@@ -47,4 +47,26 @@ it('aceita portfólio opcional e rejeita URLs inválidas sem lançar exceção',
   expect(portfolio.safeParse('invalid-url').success).toBe(false);
   expect(portfolio.safeParse('https://person@example.com').success).toBe(false);
   expect(portfolio.safeParse('http://example.com').success).toBe(false);
+});
+
+describe('mídia de gameplay',()=>{
+  it.each([
+    'https://cdn.example.com/gameplay.mp4',
+    'https://cdn.example.com/gameplay.webm?token=temporary',
+    'https://www.youtube.com/watch?v=abc123',
+    'https://www.youtube.com/watch?v=abc123&feature=shared',
+    'https://youtu.be/abc123',
+    'https://vimeo.com/1234567',
+  ])('aceita vídeo HTTPS suportado: %s',url=>{
+    expect(gameVideoUrl.safeParse(url).success).toBe(true);
+  });
+  it.each([
+    'http://cdn.example.com/gameplay.mp4',
+    'https://cdn.example.com/gameplay.mov',
+    'https://person@example.com/gameplay.mp4',
+    'https://youtube.com/watch?v=x',
+    'https://youtube.com/watch?feature=shared&v=abc123',
+  ])('rejeita mídia incompatível ou insegura: %s',url=>{
+    expect(gameVideoUrl.safeParse(url).success).toBe(false);
+  });
 });

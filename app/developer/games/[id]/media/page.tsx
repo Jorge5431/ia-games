@@ -28,12 +28,15 @@ export default async function Page({params}:{params:Promise<{id:string}>}) {
         </ActionForm>}
       </div>;
     })}
-    {editable && <div className="panel"><h2>Trailer</h2><ActionForm action={editMedia.bind(null,id,'trailer')} label="Salvar trailer"><Field name="url" label="Link do trailer (HTTPS)" type="url" max={500} required/></ActionForm></div>}
+    {editable && <div className="panel"><h2>Trailer e vídeo de fundo</h2>
+      <p className="muted">Adicione um link HTTPS de trailer. Vídeos MP4 ou WebM diretos também podem ser usados como fundo cinematográfico da página do jogo; a capa será exibida enquanto o vídeo carrega.</p>
+      <ActionForm action={editMedia.bind(null,id,'trailer')} label="Salvar vídeo"><Field name="url" label="Link HTTPS do vídeo (MP4 ou WebM para o fundo)" type="url" max={500} placeholder="https://estudio.com/gameplay.mp4" required/></ActionForm>
+    </div>}
     {data.length>0 && <div className="panel"><h2>Mídias cadastradas</h2>{data.map(item=>{
       const image=publicImage(item.media_url);
       return <div key={item.id} className="row">
         {item.media_type==='screenshot'&&image ? <Image src={image} alt="Captura de tela" width={160} height={90}/> :
-          item.media_type==='trailer'&&httpsUrl.safeParse(item.media_url).success ? <a className="text-link" href={item.media_url} target="_blank" rel="noopener noreferrer">Abrir trailer</a> : <p>Mídia indisponível</p>}
+          item.media_type==='trailer'&&httpsUrl.safeParse(item.media_url).success ? <a className="text-link" href={item.media_url} target="_blank" rel="noopener noreferrer">{item.media_url.match(/\.(mp4|webm)(?:\?|$)/i)?'Vídeo de fundo · abrir arquivo':'Abrir trailer'}</a> : <p>Mídia indisponível</p>}
         {editable && <ActionForm action={removeMedia.bind(null,id,item.id)} label="Remover mídia" secondary/>}
       </div>;
     })}</div>}

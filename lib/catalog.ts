@@ -75,3 +75,13 @@ export function publicImage(url: string|null|undefined, bucket = 'game-images') 
     return null;
   }
 }
+
+export function isDirectVideoUrl(value:string|null|undefined):value is string {
+  if(!value) return false;
+  try {
+    const url=new URL(value);
+    return url.protocol==='https:'&&!url.username&&!url.password&&/\.(mp4|webm)$/i.test(url.pathname);
+  } catch {
+    return false;
+  }
+}

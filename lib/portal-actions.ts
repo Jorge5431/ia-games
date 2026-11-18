@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { requireRole } from './supabase';
-import { categories, httpsUrl, platforms, slug, textField, uuid } from './rules';
+import { categories, gameVideoUrl, platforms, slug, textField, uuid } from './rules';
 import { uploadImage } from './upload-image';
 import type { ActionState } from '@/components/action-form';
 
@@ -51,8 +51,8 @@ export async function editMedia(gameId:string,kind:'cover_url'|'banner_url'|'scr
   const {data:game,error:gameError}=await client.from('games').select('id,status').eq('id',gameId).eq('developer_id',user.id).in('status',['draft','rejected']).maybeSingle();
   if(gameError||!game) return {error:'Este jogo não está disponível para edição.'};
   if(kind==='trailer'){
-    const parsed=httpsUrl.max(500).safeParse(form.get('url'));
-    if(!parsed.success) return {error:'Informe um endereço HTTPS válido.'};
+    const parsed=gameVideoUrl.safeParse(form.get('url'));
+    if(!parsed.success) return {error:'Use um link de YouTube, Vimeo ou um arquivo MP4/WebM direto.'};
     const {error}=await client.from('game_media').insert({game_id:gameId,media_type:'trailer',media_url:parsed.data});
     if(error) return {error:'Não foi possível cadastrar o trailer.'};
   } else {
