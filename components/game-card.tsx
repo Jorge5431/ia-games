@@ -3,9 +3,10 @@ import Image from 'next/image';
 import { ArrowUpRight, Gamepad2, Star } from 'lucide-react';
 import { type Game, publicImage } from '@/lib/catalog';
 import { money } from '@/lib/rules';
+import { GameplayPreview } from './gameplay-preview';
 import { CardMotion } from './card-motion';
 
-export function GameCard({game,index=0,tilt=false}: {game:Game;index?:number;tilt?:boolean}) {
+export function GameCard({game,preview,index=0,tilt=false}: {game:Game;preview?:string;index?:number;tilt?:boolean}) {
   const image=publicImage(game.cover_url || game.banner_url);
   if (!game.slug) return null;
   return <CardMotion index={index} tilt={tilt}><Link href={'/game/'+encodeURIComponent(game.slug)} className="game-card-link">
@@ -15,5 +16,5 @@ export function GameCard({game,index=0,tilt=false}: {game:Game;index?:number;til
       <div className="game-card-meta"><span>{game.price===0?'Gratuito':money.format(game.price)}</span>
         {game.rating_average!=null && <span className="rating"><Star size={14}/>{Number(game.rating_average).toFixed(1).replace('.',',')}</span>}<ArrowUpRight className="card-arrow" size={18} aria-hidden/></div>
     </div>
-  </Link></CardMotion>;
+  </Link>{preview&&<GameplayPreview url={preview}/>}</CardMotion>;
 }
