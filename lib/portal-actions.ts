@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { requireRole } from './supabase';
 import { categories, gameVideoUrl, platforms, slug, textField, uuid } from './rules';
+import { inspectZip } from './zip-inspect';
 import { uploadImage } from './upload-image';
 import type { ActionState } from '@/components/action-form';
 
@@ -107,7 +108,22 @@ export async function saveDelivery(id:string,_previous:ActionState,form:FormData
  const {client}=await requireRole('developer','/developer/games/'+id+'/edit');
  const parsed=z.object({delivery_kind:z.enum(['web','html_zip','windows_zip']),source_url:z.string().max(1000).url().refine(v=>{try{const u=new URL(v);return u.protocol==='https:'&&!u.username&&!u.password;}catch{return false;}})}).safeParse(Object.fromEntries(form));
  if(!parsed.success)return {error:'Informe um link HTTPS válido.'};
- const {error}=await client.from('game_delivery_intake').upsert({game_id:id,...parsed.data,updated_at:new Date().toISOString()});
+ const {error}=await client.from('game_delivery_intake').upsert({game_id:id,...parsed.data,package_path:null,entry_hint:null,updated_at:new Date().toISOString()});
  if(error)return {error:'Não foi possível salvar o link do jogo.'};
  revalidatePath('/developer/games/'+id+'/edit');return {success:'Link salvo para análise.'};
+}
+
+export async function uploadPackage(id:string,_previous:ActionState,form:FormData):Promise<ActionState>{
+ if(!uuid.safeParse(id).success)return {error:'Jogo inválido.'};
+ const {client,user}=await requireRole('developer','/developer/games/'+id+'/edit');
+ const file=form.get('package');if(!(file instanceof File)||!file.name.toLowerCase().endsWith('.zip')||file.size>2097152)return {error:'Selecione um ZIP de até 2 MB.'};
+ const {data:game}=await client.from('games').select('id').eq('id',id).eq('developer_id',user.id).in('status',['draft','rejected']).maybeSingle();
+ if(!game)return {error:'Jogo indisponível para edição.'};
+ let info;try{info=inspectZip(new Uint8Array(await file.arrayBuffer()));}catch{return {error:'ZIP inválido ou estrutura não permitida.'};}
+ const path=user.id+'/'+id+'/'+crypto.randomUUID()+'.zip';
+ const {error}=await client.storage.from('game-packages').upload(path,file,{contentType:'application/zip',upsert:false});
+ if(error)return {error:'Falha no envio do arquivo.'};
+ const result=await client.from('game_delivery_intake').upsert({game_id:id,delivery_kind:info.kind,source_url:'https://vornelix-games.vercel.app/private-package',package_path:path,entry_hint:info.entry||null,updated_at:new Date().toISOString()});
+ if(result.error)return {error:'Arquivo armazenado, mas associação falhou.'};
+ revalidatePath('/developer/games/'+id+'/edit');return {success:'ZIP recebido. Aguardando análise de segurança.'};
 }
