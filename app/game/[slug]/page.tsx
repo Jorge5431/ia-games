@@ -61,11 +61,11 @@ export default async function Page({params}:Props) {
     ['Idiomas',game.languages?.join(', ')],['Lançamento',game.release_date ? new Intl.DateTimeFormat('pt-BR',{timeZone:'UTC'}).format(new Date(game.release_date)) : null],
   ];
   const ratingLabel=stats.average===null?'Sem avaliações':stats.average.toFixed(1).replace('.',',')+' · '+stats.count+(stats.count===1?' avaliação':' avaliações');
-  const delivery=current&&game.price===0?await client.from('game_delivery_intake').select('game_id').eq('game_id',game.id).eq('delivery_kind','web').is('package_path',null).maybeSingle():null;
+  const delivery=current&&game.price===0?await client.from('game_delivery_intake').select('game_id').eq('game_id',game.id).in('delivery_kind',['web','html_zip']).maybeSingle():null;
   const purchase=<>
     {delivery?.data&&<Link className="button" href={'/play/'+game.id}>Jogar agora</Link>}
     <div className="detail-price">{game.price===0?<span>Gratuito</span>:<span>{money.format(game.price)}</span>}</div>
-    {owned ? <Link className="button" href={'/downloads?game='+game.id}>Download</Link> : current && game.price===0 ?
+    {delivery?.data ? null : owned ? <Link className="button" href={'/downloads?game='+game.id}>Download</Link> : current && game.price===0 ?
       <ActionForm action={claimGame.bind(null,game.id)} label="Adicionar à biblioteca"/> :
       <Link className="button" href={'/checkout/'+game.id}>{game.price===0?'Adicionar à biblioteca':'Comprar'}</Link>}
   </>;
@@ -92,7 +92,7 @@ export default async function Page({params}:Props) {
         <h2><FallingText text={"Informações"}/></h2>
         {current ? <ActionForm action={updateWishlist.bind(null,game.id,!wish?.data,path)} label={wish?.data?'Remover dos favoritos':'Adicionar aos favoritos'} secondary/> :
           <Link className="button secondary" href={'/login?next='+encodeURIComponent(path)}>Adicionar aos favoritos</Link>}
-        {!owned&&<Link className="button secondary" href={'/downloads?game='+game.id}>Download</Link>}
+        {!owned&&!delivery?.data&&<Link className="button secondary" href={'/downloads?game='+game.id}>Download</Link>}
         <Share title={game.title}/>
         <dl>{detailFields.filter(([,value])=>value).map(([label,value])=><div key={label} className="row"><dt className="muted">{label}</dt><dd>{value}</dd></div>)}</dl>
       </aside>
