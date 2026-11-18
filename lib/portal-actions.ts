@@ -117,7 +117,7 @@ export async function saveDelivery(id:string,_previous:ActionState,form:FormData
  if(!parsed.success)return {error:'Informe um link HTTPS válido.'};
  const {error}=await client.from('game_delivery_intake').upsert({game_id:id,...parsed.data,package_path:null,entry_hint:null,updated_at:new Date().toISOString()});
  if(error)return {error:'Não foi possível salvar o link do jogo.'};
- revalidatePath('/developer/games/'+id+'/edit');return {success:'Link salvo para análise.'};
+ revalidatePath('/developer/games/'+id+'/edit');redirect('/developer/games/'+id+'/edit');
 }
 
 export async function uploadPackage(id:string,_previous:ActionState,form:FormData):Promise<ActionState>{
