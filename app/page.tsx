@@ -2,7 +2,7 @@ import { DeveloperRanking } from '@/components/developer-ranking';
 import { FallingText } from '@/components/falling-text';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { ArrowRight, Gamepad2, Upload } from 'lucide-react';
+import { ArrowRight, Gamepad2, Upload, Search } from 'lucide-react';
 import { catalog, filters } from '@/lib/catalog';
 import { Hero } from '@/components/hero';
 import { Button } from '@/components/ui/button';
@@ -29,6 +29,7 @@ export default async function Home({searchParams}:{searchParams:Promise<{code?:s
   return <div className="home immersive-home">
     <Hero/>
     <div id="home-catalog" className="cinematic-catalog">
+    <form className="home-search" action="/search" method="get" role="search"><input type="search" name="q" maxLength={80} placeholder="Pesquisar jogos..." aria-label="Pesquisar jogos"/><button type="submit" aria-label="Pesquisar"><Search size={20}/></button></form>
     {recent.offline ? <section className="cinematic-empty"><h2><FallingText text="Catálogo indisponível"/></h2><p>Tente novamente em instantes.</p></section> : !recent.count ? <section className="cinematic-empty"><p className="eyebrow">Em breve</p><h2><FallingText text="Novos universos estão chegando"/></h2><p>{emptyCatalogMessage}</p></section> :
       shelves.map(([title,href,games])=>games.length>0 && <section className="page-section" key={title}>
         <div className="section-title"><h2><FallingText text={title}/></h2><Link className="text-link" href={href}>Ver todos</Link></div><GameGrid games={games} tilt={href==='/store'}/>
