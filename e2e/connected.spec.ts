@@ -20,7 +20,7 @@ async function login(page:Page,email:string,secret= password) {
   await page.getByRole('button',{name:'Entrar',exact:true}).click();
 }
 
-async function clickMailLink(page:Page,request:APIRequestContext,email:string,type:'email'|'recovery') {
+async function mailCode(request:APIRequestContext,email:string,type:'email'|'recovery') {
   let messageId='';
   const subject=type==='email'?'Confirme sua conta Vornelix':'Redefina sua senha Vornelix';
   await expect.poll(async()=>{
@@ -33,9 +33,9 @@ async function clickMailLink(page:Page,request:APIRequestContext,email:string,ty
   const response=await request.get('http://127.0.0.1:54324/api/v1/message/'+messageId);
   expect(response.ok()).toBeTruthy();
   const message=await response.json() as {HTML:string};
-  const link=message.HTML.match(/href="([^"]+)"/)?.[1].replaceAll('&amp;','&');
-  expect(link).toContain('type='+type);
-  await page.goto(link!);
+  const code=message.HTML.match(/<strong>(\d{6})<\/strong>/)?.[1];
+  expect(code).toMatch(/^\d{6}$/);
+  return code!;
 }
 
 test.describe('Supabase local com Auth, Storage e Data API',()=>{
@@ -51,7 +51,8 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     await page.getByLabel('Confirme a senha').fill(password);
     await page.getByRole('checkbox').check();
     await page.getByRole('button',{name:'Cadastrar',exact:true}).click();
-    await expect(page.getByRole('status')).toContainText('receberá as instruções por e-mail');
+    await expect(page).toHaveURL('/verify-email');
+    await expect(page.getByRole('heading',{name:'Verifique seu e-mail'})).toBeVisible();
     const users=await supabase.auth.admin.listUsers();
     expect(users.error).toBeNull();
     const user=users.data.users.find(entry=>entry.email===email);
@@ -59,7 +60,8 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     const profile=await supabase.from('profiles').select('role,display_name').eq('id',user!.id).single();
     expect(profile.data).toEqual({role:'player',display_name:'Jogador teste'});
 
-    await clickMailLink(page,request,email,'email');
+    await page.getByLabel('Código de confirmação').fill(await mailCode(request,email,'email'));
+    await page.getByRole('button',{name:'Confirmar e-mail'}).click();
     await expect(page.getByRole('heading',{name:'E-mail confirmado!'})).toBeVisible();
     await page.getByRole('link',{name:'Continuar para minha conta'}).click();
     await expect(page).toHaveURL('/account');
@@ -87,16 +89,13 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
 
     await page.goto('/forgot-password');
     await page.getByLabel('E-mail').fill(email);
-    await page.getByRole('button',{name:'Enviar link'}).click();
-    await expect(page.getByRole('status')).toContainText('link de recuperação');
-    await clickMailLink(page,request,email,'recovery');
-    await expect(page).toHaveURL('/reset-password');
-    await page.getByLabel('Senha',{exact:true}).fill(changedPassword);
-    await page.getByLabel('Confirme a senha').fill(changedPassword);
+    await page.getByRole('button',{name:'Enviar código'}).click();
+    await expect(page).toHaveURL('/forgot-password?etapa=codigo');
+    await page.getByLabel('Código de verificação').fill(await mailCode(request,email,'recovery'));
+    await page.getByLabel('Nova senha',{exact:true}).fill(changedPassword);
+    await page.getByLabel('Confirme a nova senha').fill(changedPassword);
     await page.getByRole('button',{name:'Redefinir senha'}).click();
-    await expect(page.getByRole('status')).toHaveText('Senha atualizada.');
-    await page.goto('/account');
-    await page.getByRole('button',{name:'Sair'}).click();
+    await expect(page).toHaveURL('/login?senha=atualizada');
     await login(page,email,changedPassword);
     await expect(page).toHaveURL('/account');
   });
@@ -122,9 +121,9 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     await expect(page).toHaveURL('/account');
     await page.goto('/developer/apply');
     await page.getByLabel('Nome do estúdio').fill('Estúdio '+run);
-    await page.getByLabel('Como você usa IA').fill('Utilizamos IA na criação dos recursos visuais.');
-    await page.getByRole('button',{name:'Enviar solicitação'}).click();
-    await expect(page.getByText(/Solicitação de Estúdio.*Em análise/)).toBeVisible();
+    await page.getByLabel('Conte sobre seu projeto e uso de IA').fill('Utilizamos IA na criação dos recursos visuais.');
+    await page.getByRole('button',{name:'Enviar solicitação para análise'}).click();
+    await expect(page.getByText('Estúdio '+run+' · Em análise')).toBeVisible();
 
     const adminContext=await browser.newContext();
     const adminPage=await adminContext.newPage();
@@ -144,9 +143,11 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     await page.getByRole('button',{name:'Salvar rascunho'}).click();
     await expect(page).toHaveURL(/\/developer\/games\/[a-f0-9-]+\/edit/);
     await page.getByRole('link',{name:'Mídias'}).click();
-    await page.getByRole('button',{name:'Enviar capa'}).locator('..').locator('input[type=file]').setInputFiles('public/marca-vornelix.webp');
-    await page.getByRole('button',{name:'Enviar capa'}).click();
-    await expect(page.getByRole('img',{name:'Capa',exact:true})).toBeVisible();
+    const cover=page.locator('.panel').filter({has:page.getByRole('heading',{name:'Capa',exact:true})});
+    await cover.locator('input[type=file]').setInputFiles('public/marca-vornelix.webp');
+    await cover.getByRole('button',{name:'Salvar imagem'}).click();
+    await expect(cover.getByRole('status')).toHaveText('Imagem salva!');
+    await expect(cover.getByRole('img',{name:'Prévia'})).toBeVisible();
     await page.getByRole('link',{name:/Voltar para/}).click();
     const guestContext=await browser.newContext({reducedMotion:'reduce'});
     const guest=await guestContext.newPage();
@@ -157,6 +158,8 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     await guest.goto('/game/'+slug);
     await expect(guest.getByRole('heading',{level:1})).toHaveText('Página não encontrada');
 
+    await page.getByLabel('Link HTTPS').fill('https://example.com/game');
+    await page.getByRole('button',{name:'Salvar jogo para análise'}).click();
     await page.getByRole('button',{name:'Enviar para análise'}).click();
     await expect(page).toHaveURL('/developer/submissions');
     await adminPage.goto('/admin/moderation');
@@ -165,7 +168,7 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     await moderation.getByRole('button',{name:'Registrar decisão'}).click();
     await expect(moderation).toHaveCount(0);
     await guest.goto('/');
-    await expect(guest.getByRole('heading',{level:1})).toHaveText(title);
+    await expect(guest.getByRole('link',{name:new RegExp(title)}).first()).toBeVisible();
     await guest.goto('/search?q='+encodeURIComponent(title));
     await guest.getByRole('link',{name:new RegExp(title)}).click();
     await expect(guest.getByRole('heading',{level:1})).toHaveText(title);
