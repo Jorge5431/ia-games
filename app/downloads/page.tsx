@@ -21,6 +21,8 @@ export default async function Page({searchParams}: {searchParams:Promise<Query>}
   const {client,user}=await requireSession('/downloads'+(gameId?'?game='+encodeURIComponent(gameId):''));
   if(gameId) {
     if(!uuid.safeParse(gameId).success) notFound();
+    const {data:playable}=await client.from('game_delivery_intake').select('game_id').eq('game_id',gameId).in('delivery_kind',['web','html_zip']).maybeSingle();
+    if(playable) redirect('/play/'+gameId);
     const {state,game,url}=await assessDownload(client,user.id,gameId);
     if(state==='unavailable') notFound();
     if(state==='acquire') redirect('/checkout/'+gameId);
