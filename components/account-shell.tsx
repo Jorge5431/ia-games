@@ -10,7 +10,7 @@ export const accountLinks=[
 
 export async function AccountShell({title,children}: {title:string;children:React.ReactNode}) {
   const role = await roleOf();
-  return <section className="container page account-clean"><h1>{title}</h1><div className="dashboard">
+  return <section className="container page account-clean account-cinematic"><div className="account-backdrop" aria-hidden="true"><div className="account-backdrop-art"/><div className="account-backdrop-glow"/></div><h1>{title}</h1><div className="dashboard">
     <details className="account-menu"><summary>Menu da conta</summary><nav className="sidebar" aria-label="Minha conta">
       {accountLinks.map(([href,label])=><Link href={href} key={href}>{label}</Link>)}
       <Link href={role==='player'?'/developer/apply':'/developer/dashboard'}>{role==='player'?'Acesso de desenvolvedor':'Portal do desenvolvedor'}</Link>
