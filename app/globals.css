@@ -558,3 +558,16 @@ h2{letter-spacing:.005em}
 .category-mundo-aberto{--genre-x:50%;--genre-y:100%}
 .category-multiplayer{--genre-x:100%;--genre-y:100%}
 @media(prefers-reduced-motion:reduce){.category-grid.panoramic-categories .category-panorama::before{transition:none}.category-grid.panoramic-categories .category-panorama:hover::before{transform:none}}
+
+.header-profile{display:flex;align-items:center;gap:.65rem;color:inherit;text-decoration:none;min-width:0}
+.header-avatar,.creator-profile-avatar{display:grid;place-items:center;object-fit:cover;flex-shrink:0;border-radius:50%;background:#202020;color:#aaa;border:1px solid #444;width:40px;height:40px}
+.header-profile-text{display:flex;flex-direction:column;min-width:0;line-height:1.25}
+.header-profile-text strong{font-size:.85rem;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.header-profile-text small{color:#ff8033;font-size:.62rem;font-weight:700;letter-spacing:.06em}
+.developer-ranking h2{display:flex;align-items:center;gap:.75rem}.developer-ranking h2 svg{color:#ff6500}
+.developer-ranking ol{list-style:none;margin:0;padding:0;border-top:1px solid #292929}
+.developer-ranking li a{display:grid;grid-template-columns:3rem minmax(0,1fr) auto 20px;align-items:center;gap:1rem;padding:1rem .5rem;border-bottom:1px solid #292929;color:inherit;text-decoration:none;transition:background .2s}
+.developer-ranking li a:hover{background:#ffffff08}.rank-number{color:#ff8033;font-weight:700}.rank-count{color:#aaa;font-size:.85rem}
+.creator-profile-heading{display:flex;align-items:center;gap:1.5rem;padding-block:2rem;border-bottom:1px solid #333}
+.creator-profile-avatar{width:100px;height:100px}.creator-profile-heading .eyebrow{color:#ff6500}.creator-bio{white-space:pre-wrap;overflow-wrap:anywhere}
+@media(max-width:650px){.header-avatar{width:32px;height:32px}.header-profile{gap:.35rem}.header-profile-text strong{max-width:72px;font-size:.7rem}.header-profile-text small{font-size:.48rem}.creator-profile-avatar{width:64px;height:64px}.developer-ranking li a{grid-template-columns:2rem minmax(0,1fr) auto 16px;gap:.5rem}}
