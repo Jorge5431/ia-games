@@ -62,7 +62,7 @@ export async function authenticate(kind: 'login' | 'register' | 'forgot' | 'rese
     callback.searchParams.set('next','/reset-password');
     const { error } = await client.auth.resetPasswordForEmail(input.data,{redirectTo:callback.toString()});
     if (error && error.code !== 'user_not_found') return { error:authError(error.code) };
-    return { success:'Se houver uma conta com esse e-mail, você receberá um link de recuperação.' };
+    return { success:'Se houver uma conta com esse e-mail, você receberá instruções de recuperação.' };
   }
 
   const current = await requireSession('/reset-password');
@@ -96,4 +96,16 @@ export async function resendRegistration(_previous:ActionState,_form:FormData):P
  const client=await db(); if(!address||!client)return {error:'Reinicie o cadastro.'};
  const {error}=await client.auth.resend({type:'signup',email:address});
  return error?{error:'Não foi possível reenviar. Aguarde e tente novamente.'}:{success:'Se houver confirmação pendente, um novo código será enviado.'};
+}
+
+export async function recoverWithCode(_previous:ActionState,form:FormData):Promise<ActionState>{
+ const address=email.safeParse(form.get('email')),pass=password.safeParse(form.get('password')),token=String(form.get('token')||'').trim();
+ if(!address.success||!pass.success||pass.data!==form.get('confirm')||!/^\d{6}$/.test(token))return {error:'Confira e-mail, código e as duas senhas.'};
+ const client=await db();if(!client)return {error:'Autenticação indisponível.'};
+ const {error}=await client.auth.verifyOtp({email:address.data,token,type:'recovery'});
+ if(error)return {error:'Código inválido ou expirado. Solicite outro.'};
+ const result=await client.auth.updateUser({password:pass.data});
+ await client.auth.signOut({scope:'local'});
+ if(result.error)return {error:authError(result.error.code)};
+ redirect('/login?senha=atualizada');
 }
