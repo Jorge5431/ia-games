@@ -134,14 +134,16 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     await expect(adminPage.getByRole('heading',{name:'Estúdio '+run}).locator('..')).toContainText('Aprovada');
 
     const title='Jogo gratuito '+run;
-    const slug='jogo-gratuito-'+run;
     await page.goto('/developer/games/new');
     await page.getByLabel('Título').fill(title);
-    await page.getByLabel('Endereço do jogo').fill(slug);
-    await page.getByLabel('Descrição completa').fill('Descrição cadastrada para o teste de integração.');
-    await page.getByLabel('Declaração do uso de IA').fill('IA utilizada para criar texturas.');
+    await page.getByLabel('Descrição do jogo').fill('Descrição cadastrada para o teste de integração.');
     await page.getByRole('button',{name:'Salvar rascunho'}).click();
     await expect(page).toHaveURL(/\/developer\/games\/[a-f0-9-]+\/edit/);
+    const gameId=new URL(page.url()).pathname.split('/')[3];
+    const draft=await supabase.from('games').select('slug,status').eq('id',gameId).single();
+    expect(draft.error).toBeNull();
+    expect(draft.data?.status).toBe('draft');
+    const slug=draft.data!.slug;
     await page.getByRole('link',{name:'Mídias'}).click();
     const cover=page.locator('.panel').filter({has:page.getByRole('heading',{name:'Capa',exact:true})});
     await cover.locator('input[type=file]').setInputFiles('public/marca-vornelix.webp');
@@ -158,9 +160,10 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     await guest.goto('/game/'+slug);
     await expect(guest.getByRole('heading',{level:1})).toHaveText('Página não encontrada');
 
-    await page.getByLabel('Link HTTPS').fill('https://example.com/game');
+    await page.getByLabel('Formato').selectOption('windows_zip');
+    await page.getByLabel('Link HTTPS').fill('https://example.com/game.zip');
     await page.getByRole('button',{name:'Salvar jogo para análise'}).click();
-    await page.getByRole('button',{name:'Enviar para análise'}).click();
+    await page.getByRole('button',{name:'Salvar e enviar para análise'}).click();
     await expect(page).toHaveURL('/developer/submissions');
     await adminPage.goto('/admin/moderation');
     const moderation=adminPage.getByRole('heading',{name:title,exact:true}).locator('..');
