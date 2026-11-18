@@ -42,21 +42,31 @@ export async function submitGame(id:string,_previous:ActionState,_form:FormData)
   redirect('/developer/submissions');
 }
 
+async function queueMedia(client:Awaited<ReturnType<typeof requireRole>>['client'],id:string,kind:'cover_url'|'banner_url'|'trailer',url:string){
+ const {data:g}=await client.from('games').select('title,description,developer_id').eq('id',id).single();
+ if(!g)return {error:'Jogo indisponível.'};
+ const {data:u,error}=await client.from('game_updates').insert({game_id:id,title:g.title,description:g.description,notes:'Alteração de mídia: '+kind,media_kind:kind,media_url:url}).select('id').single();
+ if(error||!u)return {error:'Não foi possível solicitar alteração. Confira atualizações pendentes.'};
+ if(g.developer_id==='d85bf8a9-8e6c-469a-99cb-3ebbeec6b4cb'){const {error:e}=await client.rpc('review_update',{p_id:u.id,p_approve:true});if(e)return {error:'Alteração enviada, mas aprovação automática falhou.'};}
+ revalidatePath('/','layout');return {success:g.developer_id==='d85bf8a9-8e6c-469a-99cb-3ebbeec6b4cb'?'Mídia publicada.':'Mídia enviada para análise.'};
+}
 export async function editMedia(gameId:string,kind:'cover_url'|'banner_url'|'screenshot'|'trailer',_previous:ActionState,form:FormData):Promise<ActionState> {
   if(!uuid.safeParse(gameId).success) return {error:'Jogo inválido.'};
   const path='/developer/games/'+gameId+'/media';
   const {client,user}=await requireRole('developer',path);
-  const {data:game,error:gameError}=await client.from('games').select('id,status').eq('id',gameId).eq('developer_id',user.id).in('status',['draft','rejected']).maybeSingle();
+  const {data:game,error:gameError}=await client.from('games').select('id,status').eq('id',gameId).eq('developer_id',user.id).in('status',['draft','rejected','published']).maybeSingle();
   if(gameError||!game) return {error:'Este jogo não está disponível para edição.'};
   if(kind==='trailer'){
     const parsed=gameVideoUrl.safeParse(form.get('url'));
     if(!parsed.success) return {error:'Use um link de YouTube, Vimeo ou um arquivo MP4/WebM direto.'};
+    if(game.status==='published')return queueMedia(client,gameId,'trailer',parsed.data);
     const {error}=await client.from('game_media').insert({game_id:gameId,media_type:'trailer',media_url:parsed.data});
     if(error) return {error:'Não foi possível cadastrar o trailer.'};
   } else {
     if(game.status==='rejected' && kind!=='screenshot') return {error:'Salve o jogo como rascunho antes de alterar a capa ou o banner.'};
     const image=await uploadImage(client,'game-images',user.id,form.get('image'));
     if(!image.ok) return {error:image.error};
+    if(game.status==='published'){if(kind==='screenshot')return {error:'Tipo indisponível.'};return queueMedia(client,gameId,kind,image.url);}
     const result=kind==='screenshot'
       ? await client.from('game_media').insert({game_id:gameId,media_type:'screenshot',media_url:image.url}).select('id').maybeSingle()
       : await client.from('games').update({[kind]:image.url}).eq('id',gameId).eq('developer_id',user.id).eq('status','draft').select('id').maybeSingle();
@@ -129,8 +139,9 @@ export async function registerVideo(id:string,path:string):Promise<ActionState>{
  if(!uuid.safeParse(id).success)return {error:'Jogo inválido.'};
  const {client,user}=await requireRole('developer','/developer/games/'+id+'/media');
  if(!path.startsWith(user.id+'/'+id+'/')||!/^[-a-f0-9]+\.(mp4|webm)$/.test(path.split('/').at(-1)??'')||path.split('/').length!==3)return {error:'Arquivo inválido.'};
- const {data:game}=await client.from('games').select('id').eq('id',id).eq('developer_id',user.id).in('status',['draft','rejected']).maybeSingle();if(!game)return {error:'Jogo indisponível.'};
+ const {data:game}=await client.from('games').select('id,status').eq('id',id).eq('developer_id',user.id).in('status',['draft','rejected','published']).maybeSingle();if(!game)return {error:'Jogo indisponível.'};
  const {data}=client.storage.from('game-videos').getPublicUrl(path);
+ if(game.status==='published')return queueMedia(client,id,'trailer',data.publicUrl);
  const {error}=await client.from('game_media').insert({game_id:id,media_type:'trailer',media_url:data.publicUrl});
  if(error)return {error:'Não foi possível associar o vídeo.'};
  revalidatePath('/developer/games/'+id+'/media');return {success:'Vídeo salvo.'};
