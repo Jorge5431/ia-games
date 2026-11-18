@@ -163,6 +163,7 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     await page.getByLabel('Formato').selectOption('windows_zip');
     await page.getByLabel('Link HTTPS').fill('https://example.com/game.zip');
     await page.getByRole('button',{name:'Salvar jogo para análise'}).click();
+    await expect(page.getByRole('button',{name:'Salvar e enviar para análise'})).toBeVisible();
     await page.getByRole('button',{name:'Salvar e enviar para análise'}).click();
     await expect(page).toHaveURL('/developer/submissions');
     await adminPage.goto('/admin/moderation');
