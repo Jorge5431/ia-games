@@ -138,10 +138,15 @@ export async function registerVideo(id:string,path:string):Promise<ActionState>{
 
 export async function requestUpdate(id:string,_previous:ActionState,form:FormData):Promise<ActionState>{
  if(!uuid.safeParse(id).success)return {error:'Jogo inválido.'};
- const {client}=await requireRole('developer','/developer/games/'+id+'/edit');
- const parsed=z.object({title:textField(100).min(2),description:textField(15000).min(1),notes:textField(2000).min(1)}).safeParse(Object.fromEntries(form));
+ const {client,user}=await requireRole('developer','/developer/games/'+id+'/edit');
+ const parsed=z.object({genre:gameInput.shape.genre,title:textField(100).min(2),description:textField(15000).min(1),notes:textField(2000).min(1)}).safeParse(Object.fromEntries(form));
  if(!parsed.success)return {error:'Preencha todos os campos.'};
- const {error}=await client.from('game_updates').insert({game_id:id,...parsed.data});
+ const {data:game}=await client.from('games').select('id').eq('id',id).eq('developer_id',user.id).eq('status','published').maybeSingle();
+ if(!game)return {error:'Jogo indisponível.'};
+ const file=form.get('package');let delivery={};
+ if(file instanceof File&&file.size){if(file.size>2097152||!file.name.toLowerCase().endsWith('.zip'))return {error:'ZIP de até 2 MB.'};let info;try{info=inspectZip(new Uint8Array(await file.arrayBuffer()));}catch{return {error:'ZIP inválido.'};}
+ const path=user.id+'/'+id+'/'+crypto.randomUUID()+'.zip';const uploaded=await client.storage.from('game-packages').upload(path,file,{contentType:'application/zip',upsert:false});if(uploaded.error)return {error:'Falha no upload.'};delivery={package_path:path,delivery_kind:info.kind,entry_hint:info.entry||null};}
+ const {error}=await client.from('game_updates').insert({game_id:id,...parsed.data,...delivery});
  if(error)return {error:'Não foi possível enviar. Confira se já existe uma atualização pendente.'};
  revalidatePath('/developer/games/'+id+'/edit');return {success:'Atualização enviada. A versão publicada permanece disponível.'};
 }
