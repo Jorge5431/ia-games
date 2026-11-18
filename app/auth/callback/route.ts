@@ -23,5 +23,5 @@ export async function GET(request: NextRequest) {
       return response;
     }
   }
-  return NextResponse.redirect(new URL('/login?erro=link', siteUrl()));
+  return NextResponse.redirect(new URL(recovery ? '/login?erro=link' : '/auth/confirmed', siteUrl()));
 }
