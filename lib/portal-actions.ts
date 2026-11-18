@@ -4,30 +4,23 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { requireRole } from './supabase';
-import { categories, gameVideoUrl, platforms, slug, textField, uuid } from './rules';
+import { categories, gameVideoUrl, textField, uuid } from './rules';
 import { inspectZip } from './zip-inspect';
 import { uploadImage } from './upload-image';
 import type { ActionState } from '@/components/action-form';
 
-const gameInput=z.object({
-  title:textField(100).min(2),slug,short_description:textField(240),description:textField(15000),
-  price:z.string().trim().regex(/^\d{1,7}(\.\d{1,2})?$/).transform(Number),
-  genre:z.string().refine(value=>categories.some(([,label])=>value===label)),
-  languages:textField(200).transform(value=>value.split(',').map(item=>item.trim()).filter(Boolean)),
-  release_date:z.union([z.iso.date(),z.literal('')]).transform(value=>value||null),
-  minimum_requirements:textField(4000),recommended_requirements:textField(4000),ai_disclosure:textField(4000),
-});
+const gameInput=z.object({title:textField(100).min(2),description:textField(15000).min(1),genre:z.string().refine(value=>categories.some(([,label])=>value===label))});
 
 export async function saveGame(id:string|null,_previous:ActionState,form:FormData):Promise<ActionState> {
   if(id && !uuid.safeParse(id).success) return {error:'Jogo inválido.'};
   const {client,user}=await requireRole('developer',id?'/developer/games/'+id+'/edit':'/developer/games/new');
   const result=gameInput.safeParse(Object.fromEntries(form));
-  const selected=z.array(z.enum(platforms)).max(platforms.length).safeParse(form.getAll('platform'));
-  if(!result.success||!selected.success) return {error:'Confira o título, endereço do jogo, gênero, data e preço antes de salvar.'};
-  const values={...result.data,platform:Array.from(new Set(selected.data))};
+  if(!result.success)return {error:'Preencha título, gênero e descrição.'};
+  const base=result.data.title.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,75).replace(/-$/,'')||'jogo';
+  const values={...result.data,short_description:result.data.description.slice(0,240),price:0};
   const mutation=id
     ? client.from('games').update({...values,status:'draft'}).eq('id',id).eq('developer_id',user.id).in('status',['draft','rejected'])
-    : client.from('games').insert({...values,developer_id:user.id});
+    : client.from('games').insert({...values,slug:base+'-'+crypto.randomUUID().slice(0,12),developer_id:user.id});
   const {data,error}=await mutation.select('id').maybeSingle();
   if(error||!data) return {error:error?.code==='23505'?'Este endereço de jogo já existe. Escolha outro.':'Não foi possível salvar o rascunho.'};
   revalidatePath('/developer','layout');
@@ -40,7 +33,7 @@ export async function submitGame(id:string,_previous:ActionState,_form:FormData)
   if(!uuid.safeParse(id).success) return {error:'Jogo inválido.'};
   const {client}=await requireRole('developer','/developer/games/'+id+'/edit');
   const {error}=await client.rpc('submit_game',{p_game_id:id});
-  if(error) return {error:'Preencha título, endereço, descrição e declaração de uso de IA antes de enviar.'};
+  if(error) return {error:'Salve título, gênero, descrição e o arquivo ZIP ou link do jogo antes de enviar.'};
   revalidatePath('/developer','layout');
   redirect('/developer/submissions');
 }
