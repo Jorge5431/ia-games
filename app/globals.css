@@ -417,3 +417,32 @@ h2{letter-spacing:.005em}
 .cinematic-catalog .category-grid a:hover{color:var(--accent);background:none}
 .cinematic-catalog .section-title{animation:none}
 @media(max-width:660px){.home .cinematic-home-hero{min-height:100svh;align-items:end}.cinematic-home-hero .cinematic-banner-image{object-fit:contain;object-position:center 28%}.cinematic-home-hero .hero-content{margin:0;padding:6rem 1.25rem 6.5rem}.cinematic-home-hero .hero-shade{background:linear-gradient(0deg,#080808 0%,#080808e8 20%,#08080870 47%,transparent 76%)}.home>.cinematic-catalog{padding-inline:1rem}.cinematic-scroll{bottom:1rem}}
+
+/* Panoramic category artwork and gameplay preview */
+.category-grid.panoramic-categories,.cinematic-catalog .category-grid.panoramic-categories{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+.category-grid .category-panorama,.cinematic-catalog .category-grid .category-panorama{position:relative;isolation:isolate;overflow:hidden;min-height:112px;aspect-ratio:3/1;display:flex;align-items:end;padding:1rem;border:0;border-radius:0;color:#fff;background:#141414}
+.category-panorama::before{content:"";position:absolute;inset:0;z-index:-2;background:var(--category-art) center/cover;transition:transform .45s}
+.category-panorama::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(0deg,#080808e0,transparent 80%)}
+.category-panorama:hover::before{transform:scale(1.08)}
+.category-acao{--category-art:url('/category-art/acao.svg')}
+.category-aventura{--category-art:url('/category-art/aventura.svg')}
+.category-rpg{--category-art:url('/category-art/rpg.svg')}
+.category-sobrevivencia{--category-art:url('/category-art/sobrevivencia.svg')}
+.category-terror{--category-art:url('/category-art/terror.svg')}
+.category-estrategia{--category-art:url('/category-art/estrategia.svg')}
+.category-simulacao{--category-art:url('/category-art/simulacao.svg')}
+.category-corrida{--category-art:url('/category-art/corrida.svg')}
+.category-puzzle{--category-art:url('/category-art/puzzle.svg')}
+.category-indie{--category-art:url('/category-art/indie.svg')}
+.category-mundo-aberto{--category-art:url('/category-art/mundo-aberto.svg')}
+.category-multiplayer{--category-art:url('/category-art/multiplayer.svg')}
+.game-card{position:relative}
+.gameplay-preview{position:absolute;inset:0 0 auto;aspect-ratio:16/10;pointer-events:auto;overflow:hidden}
+.gameplay-preview video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
+.preview-toggle{position:absolute;right:.5rem;bottom:.5rem;display:grid;place-items:center;min-width:44px;min-height:44px;background:#080808c9;color:#fff;border:1px solid #ff6500;border-radius:50%}
+.publication-editor{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:1.25rem;align-items:start}
+.publication-preview{display:grid;gap:1rem;position:sticky;top:6rem;min-width:0}
+.publication-preview .game-cover img{width:100%;height:100%;object-fit:cover}
+.publication-banner{min-height:210px;display:flex;flex-direction:column;justify-content:end;gap:.5rem;padding:1rem;background:radial-gradient(ellipse at top right,#762a10,#080808);background-size:cover;background-position:center;color:#fff}
+@media(max-width:800px){.publication-editor{grid-template-columns:minmax(0,1fr)}.publication-preview{position:static}.category-grid.panoramic-categories,.cinematic-catalog .category-grid.panoramic-categories{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:420px){.category-grid .category-panorama,.cinematic-catalog .category-grid .category-panorama{min-height:90px;padding:.6rem;font-size:.8rem}}
