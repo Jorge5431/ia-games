@@ -34,7 +34,7 @@ export async function submitGame(id:string,_previous:ActionState,_form:FormData)
   if(!uuid.safeParse(id).success) return {error:'Jogo inválido.'};
   const {client}=await requireRole('developer','/developer/games/'+id+'/edit');
   const {error}=await client.rpc('submit_game',{p_game_id:id});
-  if(error) return {error:'Salve título, gênero, descrição e o arquivo ZIP ou link do jogo antes de enviar.'};
+  if(error) { console.error('submit_game',error.code,error.message); return {error:error.message.startsWith('Jogo incompleto')?'Preencha título, gênero, descrição e envie o arquivo ou link.':'Não foi possível publicar. Código: '+error.code}; }
   revalidatePath('/developer','layout');
   revalidatePath('/','layout');
   const {data:published}=await client.from('games').select('status,slug').eq('id',id).maybeSingle();
