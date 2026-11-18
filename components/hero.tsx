@@ -61,7 +61,7 @@ export function Hero({ slides }: {slides:Slide[]}) {
     <div className="hero-content">
       <AnimatePresence initial={false} mode="wait"><motion.div key={slide.title}
         initial={reduced ? false : {opacity:0,y:12}} animate={{opacity:1,y:0}} exit={reduced ? undefined : {opacity:0,y:-6}} transition={{duration:.2}}>
-        <p className="eyebrow">{rotating || slide.image ? 'Em destaque' : 'VORNELIX'}</p>
+        {(rotating || slide.image) && <p className="eyebrow">Em destaque</p>}
         <h1>{slide.title}</h1>
         <p>{slide.summary}</p>
         <Link className="button" href={slide.href}>{slide.href==='/store' ? 'Explorar loja' : 'Ver detalhes'}<ArrowRight size={18}/></Link>

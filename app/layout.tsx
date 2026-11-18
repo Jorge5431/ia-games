@@ -7,9 +7,8 @@ import { Brand } from '@/components/brand';
 import { Navigation } from '@/components/navigation';
 import { session } from '@/lib/supabase';
 import { siteUrl } from '@/lib/config';
-import '@fontsource/archivo-black/latin-400.css';
-import '@fontsource/raleway/latin-300.css';
 import '@fontsource-variable/instrument-sans';
+import '@fontsource-variable/orbitron';
 import './globals.css';
 
 export const metadata: Metadata = {
