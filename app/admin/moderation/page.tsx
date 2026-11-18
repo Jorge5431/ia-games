@@ -13,7 +13,7 @@ export default async function Page() {
   const {data,error}=await client.from('games').select(gameDetailsFields+',game_media(id,media_url,media_type)').eq('status','pending').order('updated_at').limit(100);
   if(error) throw new Error('Não foi possível consultar a fila de moderação.');
   const games=data as unknown as (Game & {game_media:{id:string;media_url:string;media_type:string}[]})[];
-  const {data:deliveries}=await client.from('game_delivery_intake').select('game_id,delivery_kind,source_url');
+  const {data:deliveries}=await client.from('game_delivery_intake').select('game_id,delivery_kind,source_url,package_path,entry_hint');
   return <PortalShell kind="admin" title="Moderação de jogos">
     {!games.length && <div className="panel"><p>Nenhum jogo aguardando análise.</p></div>}
     {games.map(game=>{
@@ -28,7 +28,7 @@ export default async function Page() {
           return media.media_type==='screenshot'&&src ? <Image key={media.id} src={src} alt="Captura de tela" width={144} height={81}/> :
             media.media_type==='trailer'&&httpsUrl.safeParse(media.media_url).success?<a key={media.id} className="text-link" href={media.media_url} target="_blank" rel="noopener noreferrer">Abrir trailer</a>:null;
         })}</div>
-        {(deliveries??[]).filter(d=>d.game_id===game.id).map(d=><div key={d.game_id}><h3>Arquivo ou link para análise</h3><p>{d.delivery_kind} · {d.source_url}</p><p className="muted">Conteúdo não verificado. Não execute arquivos na máquina principal.</p></div>)}<ActionForm action={moderateGame.bind(null,game.id)} label="Registrar decisão">
+        {(deliveries??[]).filter(d=>d.game_id===game.id).map(d=><div key={d.game_id}><h3>Arquivo ou link para análise</h3><p>{d.delivery_kind} · {d.package_path?"ZIP privado: "+d.package_path:d.source_url}</p>{d.entry_hint&&<p>Entrada detectada: {d.entry_hint}</p>}<p className="muted">Conteúdo não verificado. Não execute arquivos na máquina principal.</p></div>)}<ActionForm action={moderateGame.bind(null,game.id)} label="Registrar decisão">
           <label className="field">Decisão<select name="decision" defaultValue="" required><option value="">Selecione</option><option value="approve">Aprovar publicação</option><option value="reject">Rejeitar publicação</option></select></label>
           <Notes name="notes" label="Nota de moderação"/>
         </ActionForm>
