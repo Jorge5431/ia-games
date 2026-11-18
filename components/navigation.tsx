@@ -4,14 +4,14 @@ import { useGentleMotion } from './preferences-provider';
 import Link from 'next/link';
 import { Brand } from './brand';
 import { usePathname } from 'next/navigation';
-import { Menu, Search, Settings2, X } from 'lucide-react';
+import { Menu, Search, Settings2, UserRound, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { useLabel } from './preferences-provider';
 
 
 
-export function Navigation({signedIn}: {signedIn:boolean}) {
+export function Navigation({signedIn,profile}: {signedIn:boolean;profile?:{username:string;avatar:string|null;developer:boolean}|null}) {
   const path = usePathname();
   const [scrolled,setScrolled]=useState(false);
   useEffect(()=>{const update=()=>setScrolled(window.scrollY>48);update();window.addEventListener('scroll',update,{passive:true});return()=>window.removeEventListener('scroll',update);},[]);
@@ -32,7 +32,7 @@ export function Navigation({signedIn}: {signedIn:boolean}) {
       )}</nav>
       <div className="header-actions"><Link className="icon-button" href="/settings" aria-label={t('Preferências','Preferences','Preferencias')}><Settings2 size={20}/></Link>
         <Link className="icon-button" href="/search" aria-label="Pesquisar"><Search size={20}/></Link>
-        <Link className="button secondary desktop-account" href={signedIn ? '/account' : '/login'}>{signedIn ? t('Minha conta','My account','Mi cuenta') : t('Entrar','Sign in','Entrar')}</Link>
+        {signedIn&&profile?<Link className="header-profile" href="/account" aria-label="Minha conta">{profile.avatar?<img src={profile.avatar} alt="" className="header-avatar"/>:<span className="header-avatar"><UserRound size={20}/></span>}<span className="header-profile-text"><strong>{profile.username}</strong>{profile.developer&&<small>DESENVOLVEDOR</small>}</span></Link>:<Link className="button secondary desktop-account" href={signedIn ? '/account' : '/login'}>{signedIn ? t('Minha conta','My account','Mi cuenta') : t('Entrar','Sign in','Entrar')}</Link>}
         <button className="icon-button mobile-toggle" type="button" aria-label={open ? 'Fechar menu mobile' : 'Abrir menu mobile'} aria-expanded={open} aria-controls="mobile-navigation" onClick={toggle}>{open ? <X/> : <Menu/>}</button>
       </div>
     </div>
