@@ -17,9 +17,9 @@ export default async function Home({searchParams}:{searchParams:Promise<{code?:s
     catalog(filters({order:'popular',rating:'1'}),4),
   ]);
   const featured=recent.games.filter(game=>game.slug && publicImage(game.banner_url || game.cover_url)).slice(0,4);
-  const slides:Slide[]=featured.length ? featured.map(game=>({
+  const slides:Slide[]=[institutional,...featured.map(game=>({
     title:game.title,summary:game.short_description||'',href:'/game/'+encodeURIComponent(game.slug!),image:publicImage(game.banner_url||game.cover_url),
-  })) : [institutional];
+  }))];
   const recommendations = recent.games.filter(game=>!top.games.some(ranked=>ranked.id===game.id)).slice(4,8);
   const shelves=[
     ['Lançamentos recentes','/store',recent.games],

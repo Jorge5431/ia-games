@@ -37,7 +37,7 @@ export function Hero({ slides }: {slides:Slide[]}) {
   }
 
   const slide = slides[index];
-  return <section ref={section} className="hero" aria-label={rotating ? 'Jogos em destaque' : 'Vornelix'}
+  return <section ref={section} className="hero" aria-label={rotating ? 'Vornelix e jogos em destaque' : 'Vornelix'}
     onPointerEnter={event => { if(event.pointerType==='mouse') setInteracting(true); }}
     onPointerLeave={() => setInteracting(false)}
     onFocusCapture={() => setFocused(true)}
@@ -54,7 +54,7 @@ export function Hero({ slides }: {slides:Slide[]}) {
     <AnimatePresence initial={false}>
       <motion.div key={slide.href} className="hero-art" aria-hidden initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced?0:.4}}>
         <DepthBackdrop/>{slide.image ? <motion.div className="hero-image-track" style={reduced?undefined:{y}}><Image src={slide.image} alt="" fill sizes="100vw" className="hero-image" priority={index===0}/></motion.div> :
-          <div className="institution-art"><div className="art-grid"/><span className="art-orbit"/><Image src="/marca-vornelix.webp" alt="" width={380} height={380} priority/></div>}
+          <div className="institution-art"><div className="art-grid"/><span className="art-orbit"/><Image src="/vornelix-home-banner.svg" alt="" width={650} height={185} unoptimized priority style={{width:'100%',maxWidth:650,height:'auto',mixBlendMode:'normal',maskImage:'none'}}/></div>}
       </motion.div>
     </AnimatePresence>
     <div className="hero-shade"/>
