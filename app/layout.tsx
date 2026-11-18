@@ -25,7 +25,7 @@ export default async function RootLayout({children}:Readonly<{children:React.Rea
   const preferences=parsePreferences((await cookies()).get(preferenceCookie)?.value);
   return <html lang="pt-BR" data-theme={preferences.theme} data-motion={preferences.motion} data-text-size={preferences.textSize} data-contrast={preferences.contrast} data-density={preferences.density}><body><PreferencesProvider initial={preferences}>
     <a className="skip" href="#main">Pular para o conteúdo</a>
-    <Navigation signedIn={Boolean(current)} profile={profile?{username:profile.username,avatar:publicImage(profile.avatar_url,'avatars'),developer:profile.role==='developer'}:null}/>
+    <Navigation signedIn={Boolean(current)} profile={profile?{username:profile.username,avatar:publicImage(profile.avatar_url,'avatars'),developer:profile.role==='developer',creator:current?.user.id==='d85bf8a9-8e6c-469a-99cb-3ebbeec6b4cb'}:null}/>
     <main id="main">{children}</main>
     <footer className="footer"><div className="container footer-inner">
       <div><Brand/></div>
