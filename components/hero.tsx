@@ -3,11 +3,10 @@ import { FallingText } from '@/components/falling-text';
 import { useGentleMotion } from './preferences-provider';
 
 import Image from 'next/image';
-import { DepthBackdrop } from './depth-backdrop';
 import { usePreferences } from './preferences-provider';
 import Link from 'next/link';
 import { AnimatePresence, motion, useScroll, useTransform } from 'motion/react';
-import { ArrowRight, ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
+import { ArrowRight, ChevronDown, ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 export type Slide = { title:string; summary:string; href:string; image:string|null };
@@ -23,7 +22,8 @@ export function Hero({ slides }: {slides:Slide[]}) {
   const touch = useRef(0);
   const section = useRef<HTMLElement>(null);
   const {scrollYProgress} = useScroll({target:section,offset:['start start','end start']});
-  const y = useTransform(scrollYProgress,[0,1],['0%','9%']);
+  const y = useTransform(scrollYProgress,[0,1],['0%','22%']);
+  const fade = useTransform(scrollYProgress,[0,.35,1],[1,.85,0]);
   const rotating = slides.length>1;
   const active = preferences.autoplay && rotating && !paused && !interacting && !focused && !reduced;
 
@@ -38,7 +38,7 @@ export function Hero({ slides }: {slides:Slide[]}) {
   }
 
   const slide = slides[index];
-  return <section ref={section} className="hero" aria-label={rotating ? 'Vornelix e jogos em destaque' : 'Vornelix'}
+  return <section ref={section} className="hero cinematic-home-hero" aria-label={rotating ? 'Vornelix e jogos em destaque' : 'Vornelix'}
     onPointerEnter={event => { if(event.pointerType==='mouse') setInteracting(true); }}
     onPointerLeave={() => setInteracting(false)}
     onFocusCapture={() => setFocused(true)}
@@ -54,8 +54,8 @@ export function Hero({ slides }: {slides:Slide[]}) {
     }}>
     <AnimatePresence initial={false}>
       <motion.div key={slide.href} className="hero-art" aria-hidden initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced?0:.4}}>
-        <DepthBackdrop/>{slide.image ? <motion.div className="hero-image-track" style={reduced?undefined:{y}}><Image src={slide.image} alt="" fill sizes="100vw" className="hero-image" priority={index===0}/></motion.div> :
-          <div className="institution-art"><div className="art-grid"/><span className="art-orbit"/><Image src="/vornelix-home-banner.svg" alt="" width={650} height={185} unoptimized priority style={{position:'absolute',top:'clamp(1rem,4vw,2.25rem)',right:'clamp(1rem,4vw,2.5rem)',width:'clamp(220px,42vw,520px)',height:'auto',mixBlendMode:'normal',maskImage:'none'}}/></div>}
+        <motion.div className="cinematic-art-layer" style={reduced?undefined:{y,opacity:fade}}>{slide.image ? <motion.div className="hero-image-track" ><Image src={slide.image} alt="" fill sizes="100vw" className="hero-image" priority={index===0}/></motion.div> :
+          <div className="institution-art cinematic-institution"><Image src="/vornelix-home-banner.svg" alt="" fill sizes="100vw" unoptimized priority className="cinematic-banner-image"/></div>}</motion.div>
       </motion.div>
     </AnimatePresence>
     <div className="hero-shade"/>
@@ -76,5 +76,6 @@ export function Hero({ slides }: {slides:Slide[]}) {
         </button>)}</div>
       </div>}
     </div>
+    <a href="#home-catalog" className="cinematic-scroll" aria-label="Descer para o catálogo"><ChevronDown size={24}/></a>
   </section>;
 }
