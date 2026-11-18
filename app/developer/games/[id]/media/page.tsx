@@ -30,6 +30,7 @@ export default async function Page({params}:{params:Promise<{id:string}>}) {
         {editable && game.status!=='rejected' ? <GameImageUpload id={id} kind={kind} current={image}/> : image && <Image src={image} alt={title} width={224} height={126}/>}
       </div>;
     })}
+    {editable && <div className="panel"><h2>Capturas de tela</h2><p className="muted">Adicione imagens do gameplay. Jogos publicados passam por análise de mídia, exceto publicação direta autorizada.</p><GameImageUpload id={id} kind="screenshot" current={null}/></div>}
     {editable && <div className="panel"><h2>Trailer e vídeo de fundo</h2>
       <p className="muted">Envie um vídeo MP4 ou WebM do seu dispositivo, ou cole um link. O primeiro vídeo MP4 ou WebM direto será usado no preview do card e como fundo cinematográfico da página do jogo; a capa será exibida enquanto o vídeo carrega.</p>
       <VideoUpload id={id}/><ActionForm action={editMedia.bind(null,id,'trailer')} label="Salvar vídeo"><Field name="url" label="Link HTTPS do vídeo (MP4 ou WebM para o fundo)" type="url" max={500} placeholder="https://estudio.com/gameplay.mp4" required/></ActionForm>
