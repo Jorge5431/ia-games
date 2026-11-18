@@ -22,12 +22,13 @@ export async function AuthPage({kind, query}: {kind:keyof typeof titles; query:P
       <input type="hidden" name="next" value={next}/>
       {kind === 'register' && <Field name="displayName" label="Nome de exibição" autoComplete="nickname" max={60} required/>}
       {kind !== 'reset' && <Field name="email" label="E-mail" type="email" autoComplete="email" required max={254}/>}
-      {(kind === 'login' || kind === 'reset') && <Field name="password" label="Senha" type="password" autoComplete={kind==='forgot'&&<Link href="/forgot-password?etapa=codigo">Já tenho um código</Link>}{kind === 'login' ? 'current-password' : 'new-password'} min={kind === 'login' ? undefined : 8} required/>}
+      {(kind === 'login' || kind === 'reset') && <Field name="password" label="Senha" type="password" autoComplete={kind === 'login' ? 'current-password' : 'new-password'} min={kind === 'login' ? undefined : 8} required/>}
       {kind === 'register' && <RegistrationPassword/>}
       {kind === 'reset' && <Field name="confirm" label="Confirme a senha" type="password" autoComplete="new-password" required/>}
       {kind === 'register' && <label className="check"><input name="terms" type="checkbox" required/><span>Li e aceito os <Link href="/terms" target="_blank">termos de uso</Link>.</span></label>}
     </ActionForm>
     <div className="auth-links">
+      {kind==='forgot'&&<Link href="/forgot-password?etapa=codigo">Já tenho um código</Link>}
       {kind === 'login' ? <><Link href={'/register?next='+encodeURIComponent(next)}>Criar conta</Link><Link href="/forgot-password">Esqueci minha senha</Link></> : <Link href={'/login?next='+encodeURIComponent(next)}>Ir para o login</Link>}
     </div>
   </div></section>;
