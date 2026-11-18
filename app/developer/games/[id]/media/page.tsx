@@ -5,7 +5,8 @@ import { ActionForm, Field } from '@/components/action-form';
 import { PortalShell } from '@/components/portal-shell';
 import { ownerGame } from '@/lib/portal-data';
 import { editMedia, removeMedia } from '@/lib/portal-actions';
-import { publicImage } from '@/lib/catalog';
+import { GameplayPreview } from '@/components/gameplay-preview';
+import { publicImage, isDirectVideoUrl } from '@/lib/catalog';
 import { httpsUrl } from '@/lib/rules';
 
 export const metadata={title:'Mídias do jogo'};
@@ -17,11 +18,14 @@ export default async function Page({params}:{params:Promise<{id:string}>}) {
   if(error) throw new Error('Não foi possível carregar as mídias.');
   const editable=['draft','rejected'].includes(game.status);
   const uploads=[['cover_url','Capa','Enviar capa'],['banner_url','Banner','Enviar banner'],['screenshot','Capturas de tela','Enviar captura de tela']] as const;
-  return <PortalShell kind="developer" title="Mídias do jogo">
+  const preview=data.find(item=>item.media_type==='trailer'&&isDirectVideoUrl(item.media_url))?.media_url;
+  return <PortalShell kind="developer" title="2. Identidade visual e gameplay">
+    <p className="muted">As mídias abaixo são usadas na loja e na página do jogo. Salve cada arquivo para atualizar a prévia.</p>
+    <div className="publication-editor"><article className="game-card"><div className="game-cover">{publicImage(game.cover_url)?<Image src={publicImage(game.cover_url)!} alt="Capa do jogo" fill sizes="300px"/>:<span>Sem capa</span>}</div><div className="game-card-text"><h3>{game.title}</h3><p>{game.price===0?"Gratuito":game.price.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</p></div>{preview&&<GameplayPreview url={preview}/>}</article><div className="publication-banner" style={publicImage(game.banner_url)?{backgroundImage:"linear-gradient(0deg,#080808,transparent),url("+JSON.stringify(publicImage(game.banner_url))+")"}:undefined}><h2>{game.title}</h2><p>{game.short_description}</p></div></div>
     <div><Link className="button secondary" href={'/developer/games/'+id+'/edit'}>Voltar para {game.title}</Link></div>
     {uploads.map(([kind,title,label])=>{
       const image=kind==='screenshot'?null:publicImage(game[kind]);
-      return <div className="panel" key={kind}><h2>{title}</h2>
+      return <div className="panel" key={kind}><h2>{title}</h2><p className="muted">{kind==="cover_url"?"Recomendado: 1280 × 800 px (16:10). Aparece nos cards.":kind==="banner_url"?"Recomendado: 1920 × 1080 px (16:9). Fundo da página do jogo.":"Recomendado: 1920 × 1080 px. Imagens reais do gameplay."}</p>
         {image && <Image src={image} alt={title} width={224} height={126}/>}
         {editable && (game.status==='draft'||kind==='screenshot') && <ActionForm action={editMedia.bind(null,id,kind)} label={label}>
           <ImageField/>
@@ -29,7 +33,7 @@ export default async function Page({params}:{params:Promise<{id:string}>}) {
       </div>;
     })}
     {editable && <div className="panel"><h2>Trailer e vídeo de fundo</h2>
-      <p className="muted">Adicione um link HTTPS de trailer. Vídeos MP4 ou WebM diretos também podem ser usados como fundo cinematográfico da página do jogo; a capa será exibida enquanto o vídeo carrega.</p>
+      <p className="muted">Adicione um link HTTPS de trailer. O primeiro vídeo MP4 ou WebM direto será usado no preview do card e como fundo cinematográfico da página do jogo; a capa será exibida enquanto o vídeo carrega.</p>
       <ActionForm action={editMedia.bind(null,id,'trailer')} label="Salvar vídeo"><Field name="url" label="Link HTTPS do vídeo (MP4 ou WebM para o fundo)" type="url" max={500} placeholder="https://estudio.com/gameplay.mp4" required/></ActionForm>
     </div>}
     {data.length>0 && <div className="panel"><h2>Mídias cadastradas</h2>{data.map(item=>{
@@ -40,5 +44,6 @@ export default async function Page({params}:{params:Promise<{id:string}>}) {
         {editable && <ActionForm action={removeMedia.bind(null,id,item.id)} label="Remover mídia" secondary/>}
       </div>;
     })}</div>}
+    <Link className="button" href={'/developer/games/'+id+'/edit'}>3. Revisar e enviar para análise</Link>
   </PortalShell>;
 }
