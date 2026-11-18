@@ -24,14 +24,14 @@ test('confirmação não apresenta sucesso sem sessão válida',async({page})=>{
 });
 test('efeitos acompanham scroll e ficam imóveis em movimento reduzido',async({page})=>{
   await page.goto('/');
-  const ring=page.locator('.depth-ring');
+  const ring=page.locator('.immersive-art');
   const before=await ring.evaluate(el=>getComputedStyle(el).transform);
   await page.mouse.wheel(0,450);
   await expect.poll(()=>ring.evaluate(el=>getComputedStyle(el).transform)).not.toBe(before);
   await page.goto('/settings');
   await page.getByLabel('Movimento',{exact:true}).selectOption('reduced');
   await page.goto('/');
-  const stationary=page.locator('.depth-ring');
+  const stationary=page.locator('.immersive-art');
   const isIdentity=()=>stationary.evaluate(el=>new DOMMatrixReadOnly(getComputedStyle(el).transform).isIdentity);
   await expect.poll(isIdentity).toBe(true);
   await page.mouse.wheel(0,450);
