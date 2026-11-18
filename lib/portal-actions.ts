@@ -120,3 +120,14 @@ export async function uploadPackage(id:string,_previous:ActionState,form:FormDat
  if(result.error)return {error:'Arquivo armazenado, mas associação falhou.'};
  revalidatePath('/developer/games/'+id+'/edit');return {success:'ZIP recebido. Aguardando análise de segurança.'};
 }
+
+export async function registerVideo(id:string,path:string):Promise<ActionState>{
+ if(!uuid.safeParse(id).success)return {error:'Jogo inválido.'};
+ const {client,user}=await requireRole('developer','/developer/games/'+id+'/media');
+ if(!path.startsWith(user.id+'/'+id+'/')||!/^[-a-f0-9]+\.(mp4|webm)$/.test(path.split('/').at(-1)??'')||path.split('/').length!==3)return {error:'Arquivo inválido.'};
+ const {data:game}=await client.from('games').select('id').eq('id',id).eq('developer_id',user.id).in('status',['draft','rejected']).maybeSingle();if(!game)return {error:'Jogo indisponível.'};
+ const {data}=client.storage.from('game-videos').getPublicUrl(path);
+ const {error}=await client.from('game_media').insert({game_id:id,media_type:'trailer',media_url:data.publicUrl});
+ if(error)return {error:'Não foi possível associar o vídeo.'};
+ revalidatePath('/developer/games/'+id+'/media');return {success:'Vídeo salvo.'};
+}
