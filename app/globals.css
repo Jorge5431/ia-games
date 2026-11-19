@@ -697,3 +697,5 @@ a[href]:not(:has(img,svg,div,article)):not(.button):hover{text-shadow:0 0 9px co
 }
 @media(prefers-reduced-motion:reduce){:is(.button,button,.account-quick-links a,.portal-shortcuts a,.sidebar a,.account-menu summary,.category-panorama,[role="button"]):hover{scale:1!important;transform:none!important;transition:none!important}}
 :root[data-motion="reduced"] :is(a[href],button,summary,[role="button"],[role="tab"],[role="menuitem"],select):hover{scale:1!important;transform:none!important;transition:none!important}
+
+.avatar,.header-avatar img,img.header-avatar{aspect-ratio:1;object-fit:cover;border-radius:50%;flex-shrink:0}.avatar-crop{display:grid;gap:1rem;min-width:0}.avatar-crop-frame{width:256px;height:256px;max-width:100%;border-radius:50%;background-repeat:no-repeat;background-color:#151515;box-shadow:0 0 0 2px var(--accent),0 0 20px #ff650044;justify-self:center}.avatar-crop input[type=range]{width:100%;accent-color:var(--accent)}
