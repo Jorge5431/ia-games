@@ -679,3 +679,21 @@ a[href]:not(:has(img,svg,div,article)):not(.button):hover{text-shadow:0 0 9px co
 :is(a[href],button,[role="button"],[role="tab"],[role="menuitem"],summary):focus-visible{outline:2px solid var(--accent,#ff6500);outline-offset:3px}
 :is(a[href],button,[role="button"],summary):not(:disabled):not([aria-disabled="true"]):active{scale:.98}
 @media(prefers-reduced-motion:reduce){a[href],button,[role="button"],[role="tab"],[role="menuitem"],summary,label:has(input[type="checkbox"],input[type="radio"]),input[type="submit"],input[type="button"],select{scale:1!important;transition:none!important;filter:none!important}.category-grid.panoramic-categories .category-panorama:hover::before{transform:none!important}}
+
+/* Explicit luminous surfaces across account, developer, admin and storefront. */
+@media(hover:hover) and (pointer:fine){
+  :is(.button,button:not(.notification-bell),.account-quick-links a,.portal-shortcuts a,.sidebar a,.account-menu summary,.category-panorama,[role="button"],[role="tab"],[role="menuitem"]):not(:disabled):not([aria-disabled="true"]):hover{
+    box-shadow:0 0 0 1px #ff8033,0 0 12px #ff650099,0 0 26px #ff650044!important;
+    border-color:#ff8033!important;
+    filter:brightness(1.17)!important;
+    scale:1.045;
+  }
+  :is(.account-clean,.portal-clean,.dashboard) a[href]:not(.button):hover{
+    color:var(--accent,#ff6500);
+    text-shadow:0 0 10px #ff650099;
+  }
+  :is(.account-quick-links a,.portal-shortcuts a,.sidebar a,.account-menu summary,.button,button){transition:scale .22s ease,box-shadow .22s ease,filter .22s ease,border-color .22s ease,color .22s ease;}
+  :is(.account-quick-links,.portal-shortcuts,.toolbar,.sidebar)>:hover{z-index:2}
+}
+@media(prefers-reduced-motion:reduce){:is(.button,button,.account-quick-links a,.portal-shortcuts a,.sidebar a,.account-menu summary,.category-panorama,[role="button"]):hover{scale:1!important;transform:none!important;transition:none!important}}
+:root[data-motion="reduced"] :is(a[href],button,summary,[role="button"],[role="tab"],[role="menuitem"],select):hover{scale:1!important;transform:none!important;transition:none!important}
