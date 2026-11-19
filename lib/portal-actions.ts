@@ -176,3 +176,15 @@ export async function unpublishGame(id:string,_previous:ActionState,form:FormDat
  if(error)return {error:'Não foi possível remover o jogo. Verifique suas permissões.'};
  revalidatePath('/','layout');return {success:'Jogo removido do catálogo.'};
 }
+
+export async function deleteOwnGame(id:string,_previous:ActionState,form:FormData):Promise<ActionState>{
+ if(!uuid.safeParse(id).success||form.get('confirm')!=='yes')return {error:'Confirme a exclusão definitiva.'};
+ const {client,user}=await requireRole('developer','/developer/games');
+ const {data:game,error:lookupError}=await client.from('games').select('id,status').eq('id',id).eq('developer_id',user.id).maybeSingle();
+ if(lookupError||!game)return {error:'Jogo não encontrado ou sem permissão.'};
+ if(!['draft','rejected'].includes(game.status))return {error:'Somente rascunhos e jogos rejeitados podem ser excluídos definitivamente.'};
+ const {error}=await client.rpc('delete_own_game',{p_id:id});
+ if(error)return {error:'Não foi possível excluir. O jogo pode possuir instalações, histórico ou vínculos pendentes.'};
+ revalidatePath('/developer/games');revalidatePath('/','layout');
+ return {success:'Jogo excluído definitivamente.'};
+}
