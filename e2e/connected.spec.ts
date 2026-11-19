@@ -72,7 +72,8 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     await page.getByRole('button',{name:'Salvar perfil'}).click();
     await expect(page.getByRole('status')).toHaveText('Perfil salvo.');
     await page.locator('input[type=file]').setInputFiles('public/marca-vornelix.webp');
-    await page.getByRole('button',{name:'Enviar avatar'}).click();
+    await expect(page.getByRole('img',{name:'Prévia circular do avatar'})).toBeVisible();
+    await page.getByRole('button',{name:'Confirmar recorte e salvar'}).click();
     await expect(page.getByRole('status').filter({hasText:'Avatar atualizado.'})).toBeVisible();
     await expect(page.getByRole('img',{name:'Seu avatar'})).toBeVisible();
     await page.goto('/admin');
@@ -133,6 +134,21 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     await adminPage.getByRole('heading',{name:'Estúdio '+run}).locator('../..').getByRole('button',{name:'Aprovar',exact:true}).click();
     await expect(adminPage.getByRole('heading',{name:'Estúdio '+run}).locator('..')).toContainText('Aprovada');
 
+    const removableTitle='Rascunho removível '+run;
+    await page.goto('/developer/games/new');
+    await page.getByLabel('Título').fill(removableTitle);
+    await page.getByLabel('Descrição do jogo').fill('Rascunho criado para testar a exclusão do desenvolvedor.');
+    await page.getByRole('button',{name:'Salvar rascunho'}).click();
+    await expect(page).toHaveURL(/\/developer\/games\/[a-f0-9-]+\/edit/);
+    const removableId=new URL(page.url()).pathname.split('/')[3];
+    await page.goto('/developer/games');
+    const removableRow=page.locator('.row').filter({hasText:removableTitle});
+    await removableRow.getByText('Excluir definitivamente',{exact:true}).click();
+    await removableRow.getByLabel('Confirmo a exclusão definitiva deste jogo.').check();
+    await removableRow.getByRole('button',{name:'Excluir jogo permanentemente'}).click();
+    await expect(removableRow.getByRole('status')).toHaveText('Jogo excluído definitivamente.');
+    expect((await supabase.from('games').select('id').eq('id',removableId)).data).toEqual([]);
+
     const title='Jogo gratuito '+run;
     await page.goto('/developer/games/new');
     await page.getByLabel('Título').fill(title);
@@ -164,6 +180,7 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     await page.getByLabel('Link HTTPS').fill('https://example.com/game.zip');
     await page.getByRole('button',{name:'Salvar jogo para análise'}).click();
     await expect(page.getByRole('button',{name:'Salvar e enviar para análise'})).toBeVisible();
+    await page.getByLabel('Declaração de uso de IA').fill('Os recursos visuais do jogo foram criados com apoio de IA generativa.');
     await page.getByRole('button',{name:'Salvar e enviar para análise'}).click();
     await expect(page).toHaveURL('/developer/submissions');
     await adminPage.goto('/admin/moderation');

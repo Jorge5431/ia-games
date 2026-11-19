@@ -9,15 +9,17 @@ import { inspectZip } from './zip-inspect';
 import { uploadImage } from './upload-image';
 import type { ActionState } from '@/components/action-form';
 
-const gameInput=z.object({title:textField(100).min(2),description:textField(15000).min(1),genre:z.string().refine(value=>categories.some(([,label])=>value===label))});
+const gameInput=z.object({title:textField(100).min(2),description:textField(15000).min(1),genre:z.string().refine(value=>categories.some(([,label])=>value===label)),ai_disclosure:textField(4000).optional()});
 
 export async function saveGame(id:string|null,_previous:ActionState,form:FormData):Promise<ActionState> {
   if(id && !uuid.safeParse(id).success) return {error:'Jogo inválido.'};
   const {client,user}=await requireRole('developer',id?'/developer/games/'+id+'/edit':'/developer/games/new');
   const result=gameInput.safeParse(Object.fromEntries(form));
   if(!result.success)return {error:'Preencha título, gênero e descrição.'};
+  const aiDisclosure=result.data.ai_disclosure??'';
+  if(form.get('intent')==='submit'&&!aiDisclosure)return {error:'Informe como a IA foi usada ou confirme que não foi usada.'};
   const base=result.data.title.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,75).replace(/-$/,'')||'jogo';
-  const values={...result.data,short_description:result.data.description.slice(0,240),price:0};
+  const values={...result.data,ai_disclosure:aiDisclosure||null,short_description:result.data.description.slice(0,240),price:0};
   const mutation=id
     ? client.from('games').update({...values,status:'draft'}).eq('id',id).eq('developer_id',user.id).in('status',['draft','rejected'])
     : client.from('games').insert({...values,slug:base+'-'+crypto.randomUUID().slice(0,12),developer_id:user.id});
