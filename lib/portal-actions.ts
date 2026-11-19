@@ -116,7 +116,7 @@ export async function saveDelivery(id:string,_previous:ActionState,form:FormData
  const parsed=z.object({delivery_kind:z.enum(['web','html_zip','windows_zip']),source_url:z.string().max(1000).url().refine(v=>{try{const u=new URL(v);return u.protocol==='https:'&&!u.username&&!u.password;}catch{return false;}})}).safeParse(Object.fromEntries(form));
  if(!parsed.success)return {error:'Informe um link HTTPS válido.'};
  const {error}=await client.from('game_delivery_intake').upsert({game_id:id,...parsed.data,package_path:null,entry_hint:null,updated_at:new Date().toISOString()});
- if(error)return {error:'Não foi possível salvar o link do jogo.'};
+ if(error){console.error('saveDelivery',error.code,error.message);return {error:'Não foi possível salvar o link do jogo. Código: '+error.code};}
  revalidatePath('/developer/games/'+id+'/edit');redirect('/developer/games/'+id+'/edit');
 }
 
