@@ -24,6 +24,7 @@ test('confirmação não apresenta sucesso sem sessão válida',async({page})=>{
 });
 test('efeitos acompanham scroll e ficam imóveis em movimento reduzido',async({page})=>{
   await page.goto('/');
+  await expect(page.getByRole('heading',{level:1})).toBeVisible();
   const ring=page.locator('.immersive-art');
   const before=await ring.evaluate(el=>getComputedStyle(el).transform);
   await page.mouse.wheel(0,450);
@@ -31,6 +32,7 @@ test('efeitos acompanham scroll e ficam imóveis em movimento reduzido',async({p
   await page.goto('/settings');
   await page.getByLabel('Movimento',{exact:true}).selectOption('reduced');
   await page.goto('/');
+  await expect(page.getByRole('heading',{level:1})).toBeVisible();
   const stationary=page.locator('.immersive-art');
   const isIdentity=()=>stationary.evaluate(el=>new DOMMatrixReadOnly(getComputedStyle(el).transform).isIdentity);
   await expect.poll(isIdentity).toBe(true);

@@ -120,6 +120,6 @@ test('registra métricas de renderização na home institucional',async({page},t
   type MetricsWindow=Window & typeof globalThis & {__vornelixMetrics:{lcpMs:number;layoutShift:number}};
   await expect.poll(()=>page.evaluate(()=>(window as MetricsWindow).__vornelixMetrics.lcpMs)).toBeGreaterThan(0);
   const metrics=await page.evaluate(()=>(window as MetricsWindow).__vornelixMetrics);
-  expect(metrics.layoutShift).toBeLessThan(.1);
   await testInfo.attach('renderizacao-home',{body:JSON.stringify(metrics),contentType:'application/json'});
+  expect(metrics.layoutShift).toBeLessThan(.1);
 });

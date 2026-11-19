@@ -146,7 +146,7 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     await removableRow.getByText('Excluir definitivamente',{exact:true}).click();
     await removableRow.getByLabel('Confirmo a exclusão definitiva deste jogo.').check();
     await removableRow.getByRole('button',{name:'Excluir jogo permanentemente'}).click();
-    await expect(removableRow.getByRole('status')).toHaveText('Jogo excluído definitivamente.');
+    await expect(removableRow).toHaveCount(0);
     expect((await supabase.from('games').select('id').eq('id',removableId)).data).toEqual([]);
 
     const title='Jogo gratuito '+run;
