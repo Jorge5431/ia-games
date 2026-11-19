@@ -666,3 +666,16 @@ button:not(:disabled):not([aria-disabled="true"]):hover,.button:not(:disabled):n
 :where(.row,.toolbar){flex-wrap:wrap}
 :where(.button,button) {text-align:center}
 @media(prefers-reduced-motion:reduce){button,.button,[role="button"],input[type="submit"],input[type="button"]{transition:none!important;transform:none!important;filter:none!important}}
+
+/* Unified interaction motion: links, cards, genres, navigation and native controls. */
+:where(a[href],button,[role="button"],[role="tab"],[role="menuitem"],summary,label:has(input[type="checkbox"],input[type="radio"]),input[type="submit"],input[type="button"],select){transition:transform .22s cubic-bezier(.2,.75,.25,1),scale .22s cubic-bezier(.2,.75,.25,1),filter .22s ease,box-shadow .22s ease,color .22s ease;transform-origin:center}
+@media(hover:hover) and (pointer:fine){
+:is(a[href],button,[role="button"],[role="tab"],[role="menuitem"],summary,label:has(input[type="checkbox"],input[type="radio"]),input[type="submit"],input[type="button"],select):not(:disabled):not([aria-disabled="true"]):hover{scale:1.045;filter:brightness(1.15) drop-shadow(0 0 8px color-mix(in srgb,var(--accent,#ff6500) 65%,transparent));}
+a[href]:not(:has(img,svg,div,article)):not(.button):hover{text-shadow:0 0 9px color-mix(in srgb,var(--accent,#ff6500) 70%,transparent)}
+.category-grid .category-panorama:hover,.cinematic-catalog .category-grid .category-panorama:hover{scale:1.045;z-index:2;box-shadow:0 0 0 1px var(--accent,#ff6500),0 0 24px color-mix(in srgb,var(--accent,#ff6500) 50%,transparent);filter:brightness(1.14)}
+.category-grid.panoramic-categories .category-panorama:hover::before{transform:scale(1.12)}
+.game-card:has(a[href]:hover){z-index:2;box-shadow:0 0 22px color-mix(in srgb,var(--accent,#ff6500) 45%,transparent)}
+}
+:is(a[href],button,[role="button"],[role="tab"],[role="menuitem"],summary):focus-visible{outline:2px solid var(--accent,#ff6500);outline-offset:3px}
+:is(a[href],button,[role="button"],summary):not(:disabled):not([aria-disabled="true"]):active{scale:.98}
+@media(prefers-reduced-motion:reduce){a[href],button,[role="button"],[role="tab"],[role="menuitem"],summary,label:has(input[type="checkbox"],input[type="radio"]),input[type="submit"],input[type="button"],select{scale:1!important;transition:none!important;filter:none!important}.category-grid.panoramic-categories .category-panorama:hover::before{transform:none!important}}
