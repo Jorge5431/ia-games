@@ -190,3 +190,15 @@ export async function deleteOwnGame(id:string,_previous:ActionState,form:FormDat
  revalidatePath('/developer/games');revalidatePath('/','layout');
  return {success:'Jogo excluído definitivamente.'};
 }
+
+export async function setGameHeroMedia(id:string,_previous:ActionState,form:FormData):Promise<ActionState>{
+ const choice=form.get('hero_media');
+ if(!uuid.safeParse(id).success||(choice!=='banner'&&choice!=='trailer'))return {error:'Escolha Banner ou Trailer.'};
+ const {client,user}=await requireRole('developer','/developer/games/'+id+'/media');
+ const {data}=await client.from('games').select('id').eq('id',id).eq('developer_id',user.id).maybeSingle();
+ if(!data)return {error:'Você não tem permissão para alterar este jogo.'};
+ const {error}=await client.rpc('set_game_hero_media',{p_id:id,p_choice:choice});
+ if(error)return {error:'Não foi possível salvar a preferência.'};
+ revalidatePath('/','layout');
+ return {success:'Fundo da página atualizado.'};
+}
