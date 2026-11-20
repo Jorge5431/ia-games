@@ -41,7 +41,6 @@ beforeAll(async()=>{
     create function storage.foldername(name text) returns text[] language sql immutable as $$ select (string_to_array(name,'/'))[1:cardinality(string_to_array(name,'/'))-1] $$;
   `);
   for(const file of readdirSync('supabase/migrations').sort()) await db.exec(readFileSync('supabase/migrations/'+file,'utf8'));
-  await db.exec(`create table public.game_play_sessions (id uuid primary key default gen_random_uuid(), game_id uuid not null, player_id uuid not null, started_at timestamptz not null default now(), last_seen_at timestamptz not null default now(), ended_at timestamptz, active_seconds bigint not null default 0)`);
   await db.exec(`
     insert into auth.users (id,raw_user_meta_data) values
       ('${player}','{"display_name":"Jogador teste","username":"duplicate","role":"admin"}'),
