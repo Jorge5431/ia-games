@@ -201,7 +201,8 @@ img{display:block}
 .detail-page{gap:1.35rem}
 .detail-cinematic{position:relative;isolation:isolate;overflow:hidden;min-height:570px;border:1px solid #53333a;border-radius:16px;background:#1a1013;display:flex;align-items:end;padding:clamp(1.15rem,3.1vw,2.5rem);color:#f2e5d2}
 .detail-poster{position:absolute;inset:0;z-index:-3;object-fit:cover;object-position:center 35%;filter:saturate(.86)}
-.detail-gameplay{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;object-position:center 35%;pointer-events:none;filter:saturate(.88)}
+.detail-gameplay{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;object-position:center 35%;pointer-events:none;filter:saturate(.88);opacity:0;transition:opacity .3s ease}
+.detail-gameplay.is-visible{opacity:1}
 .detail-cinematic-shade{position:absolute;inset:0;z-index:-1;background:linear-gradient(0deg,#100c0df7 0%,#100c0dec 16%,#100c0d9c 48%,#100c0d33 100%),linear-gradient(90deg,#100c0d55,transparent 76%)}
 .detail-hero-top{position:absolute;z-index:2;inset:1rem 1rem auto;display:flex;align-items:center;justify-content:space-between;gap:.8rem}
 .detail-back,.detail-video-controls .icon-button{background:#140e10c7;border-color:#bda0a155;color:#fff2e6;backdrop-filter:blur(10px)}
