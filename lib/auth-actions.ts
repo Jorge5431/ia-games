@@ -92,7 +92,7 @@ export async function verifyRegistration(_previous:ActionState,form:FormData):Pr
  if(error||!data.user?.email_confirmed_at)return {error:'Código inválido ou expirado. Confira ou solicite outro.'};
  jar.delete('vornelix_pending_email'); redirect('/auth/confirmed?next=%2Faccount');
 }
-export async function resendRegistration(_previous:ActionState,_form:FormData):Promise<ActionState>{
+export async function resendRegistration():Promise<ActionState>{
  const address=(await cookies()).get('vornelix_pending_email')?.value;
  const client=await db(); if(!address||!client)return {error:'Reinicie o cadastro.'};
  const {error}=await client.auth.resend({type:'signup',email:address});

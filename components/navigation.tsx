@@ -2,12 +2,13 @@
 import { useGentleMotion } from './preferences-provider';
 
 import { NotificationBell } from './notification-bell';
+import Image from 'next/image';
 import Link from 'next/link';
 import { Brand } from './brand';
 import { usePathname } from 'next/navigation';
 import { EllipsisVertical, Search, Settings2, UserRound, Crown, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLabel } from './preferences-provider';
 
 
@@ -21,9 +22,10 @@ export function Navigation({signedIn,profile}: {signedIn:boolean;profile?:{usern
   const [openOn,setOpenOn] = useState<string|null>(null);
   const reduced = useGentleMotion();
   const open = openOn === path;
+  const menuButton = useRef<HTMLButtonElement>(null);
   const toggle = () => setOpenOn(open ? null : path);
 
-  return <header className={`site-header${path==='/'?' cinematic-header':''}${scrolled?' is-scrolled':''}`} onKeyDown={event => { if(event.key==='Escape') setOpenOn(null); }}>
+  return <header className={`site-header${path==='/'?' cinematic-header':''}${scrolled?' is-scrolled':''}`} onKeyDown={event => { if (event.key === 'Escape' && open) { setOpenOn(null); menuButton.current?.focus(); } }}>
     <div className="container header-inner">
       <Brand/>
       <nav className="desktop-nav" aria-label="Navegação principal">{primary.map(([href,label]) =>
@@ -32,8 +34,8 @@ export function Navigation({signedIn,profile}: {signedIn:boolean;profile?:{usern
         </Link>
       )}</nav>
       <div className="header-actions">{signedIn&&<NotificationBell/>}
-        {signedIn&&profile?<Link className="header-profile" href="/account" aria-label="Minha conta">{profile.avatar?<img src={profile.avatar} alt="" className="header-avatar"/>:<span className="header-avatar"><UserRound size={20}/></span>}<span className="header-profile-text"><strong>{profile.username}</strong>{profile.creator?<small><Crown size={12} style={{display:'inline',verticalAlign:'middle',marginRight:3}}/>CRIADOR</small>:profile.developer&&<small>DESENVOLVEDOR</small>}</span></Link>:<Link className="button secondary desktop-account" href={signedIn ? '/account' : '/login'}>{signedIn ? t('Minha conta','My account','Mi cuenta') : t('Entrar','Sign in','Entrar')}</Link>}
-        <button className="icon-button mobile-toggle compact-menu-toggle" type="button" aria-label={open ? 'Fechar menu' : 'Abrir menu'} aria-expanded={open} aria-controls="mobile-navigation" onClick={toggle}>{open ? <X/> : <EllipsisVertical size={20}/>}</button>
+        {signedIn&&profile?<Link className="header-profile" href="/account" aria-label="Minha conta">{profile.avatar?<Image width={40} height={40} src={profile.avatar} alt="" className="header-avatar"/>:<span className="header-avatar"><UserRound size={20}/></span>}<span className="header-profile-text"><strong>{profile.username}</strong>{profile.creator?<small><Crown size={12} style={{display:'inline',verticalAlign:'middle',marginRight:3}}/>CRIADOR</small>:profile.developer&&<small>DESENVOLVEDOR</small>}</span></Link>:<Link className="button secondary desktop-account" href={signedIn ? '/account' : '/login'}>{signedIn ? t('Minha conta','My account','Mi cuenta') : t('Entrar','Sign in','Entrar')}</Link>}
+        <button ref={menuButton} className="icon-button mobile-toggle compact-menu-toggle" type="button" aria-label={open ? 'Fechar menu' : 'Abrir menu'} aria-expanded={open} aria-controls="mobile-navigation" onClick={toggle}>{open ? <X/> : <EllipsisVertical size={20}/>}</button>
       </div>
     </div>
     <AnimatePresence initial={false}>{open && <motion.nav id="mobile-navigation" className="mobile-nav compact-menu" aria-label="Menu de navegação"

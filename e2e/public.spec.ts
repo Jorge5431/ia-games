@@ -4,7 +4,7 @@ const publicRoutes=[
   ['/','VORNELIX — Gaming Reimagined'],['/store','Loja'],['/discover','Descobrir jogos'],['/categories','Categorias'],
   ['/category/acao','Ação'],['/search','Pesquisar jogos'],['/about','Sobre a Vornelix'],['/support','Suporte'],
   ['/terms','Termos de uso'],['/privacy','Privacidade'],['/login','Entre na Vornelix'],['/register','Crie sua conta'],
-  ['/forgot-password','Recupere sua senha'],
+  ['/forgot-password','Recupere sua senha'],['/settings','Aparência e experiência'],
 ] as const;
 
 test('rotas públicas, metadados e ausência de erros JavaScript',async({page})=>{
@@ -90,7 +90,9 @@ test('menu mobile, teclado e preferência por movimento reduzido',async({page,br
   await touch.getByRole('button',{name:'Abrir menu'}).tap();
   const navigation=touch.getByRole('navigation',{name:'Menu de navegação'});
   await expect(navigation).toBeVisible();
+  await navigation.getByRole('link').first().focus();
   await touch.keyboard.press('Escape');
+  await expect(touch.getByRole('button',{name:'Abrir menu'})).toBeFocused();
   await expect(navigation).toBeHidden();
   await touch.getByRole('button',{name:'Abrir menu'}).tap();
   await navigation.getByRole('link',{name:'Descobrir'}).tap();

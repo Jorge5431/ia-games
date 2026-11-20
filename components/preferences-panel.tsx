@@ -3,12 +3,12 @@ import { useState } from 'react';
 import { defaults, type Preferences } from '@/lib/preferences';
 import { useLabel,usePreferences } from './preferences-provider';
 
-export function PreferencesPanel(){
+export function PreferencesPanel({heading: Heading = 'h2'}: {heading?: 'h1' | 'h2'}){
   const {preferences,save}=usePreferences();
   const t=useLabel();
   const [message,setMessage]=useState(false);
   function update<K extends keyof Preferences>(key:K,value:Preferences[K]) {save({...preferences,[key]:value});setMessage(true);}
-  return <section className="panel preferences-panel"><div><p className="eyebrow">{t('DO SEU JEITO','MAKE IT YOURS','A TU MANERA')}</p><h2>{t('Aparência e experiência','Appearance and experience','Apariencia y experiencia')}</h2></div>
+  return <section className="panel preferences-panel"><div><p className="eyebrow">{t('DO SEU JEITO','MAKE IT YOURS','A TU MANERA')}</p><Heading>{t('Aparência e experiência','Appearance and experience','Apariencia y experiencia')}</Heading></div>
     <p className="muted">{t('Preferências salvas neste navegador.','Preferences saved in this browser.','Preferencias guardadas en este navegador.')}</p>
     <div className="form-grid">
       <label>{t('Tema','Theme','Tema')}<select aria-label={t('Tema','Theme','Tema')} value={preferences.theme} onChange={e=>update('theme',e.target.value as Preferences['theme'])}><option value="dark">{t('Escuro','Dark','Oscuro')}</option><option value="light">{t('Claro','Light','Claro')}</option><option value="system">{t('Usar tema do sistema','Use system theme','Usar tema del sistema')}</option></select></label>

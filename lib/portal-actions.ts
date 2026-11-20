@@ -163,7 +163,7 @@ export async function requestUpdate(id:string,_previous:ActionState,form:FormDat
  if(error)return {error:'Não foi possível enviar. Confira se já existe uma atualização pendente.'};
  revalidatePath('/developer/games/'+id+'/edit');return {success:'Atualização enviada. A versão publicada permanece disponível.'};
 }
-export async function reviewUpdate(id:string,approve:boolean,_previous:ActionState,_form:FormData):Promise<ActionState>{
+export async function reviewUpdate(id:string,approve:boolean):Promise<ActionState>{
  if(!uuid.safeParse(id).success)return {error:'Atualização inválida.'};
  const {client}=await requireRole('admin','/admin/moderation');
  const {error}=await client.rpc('review_update',{p_id:id,p_approve:approve});
