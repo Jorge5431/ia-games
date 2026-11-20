@@ -4,13 +4,13 @@ import { db } from './supabase';
 import { categories, platforms } from './rules';
 
 export const gameFields = 'id,developer_id,title,slug,short_description,description,genre,price,cover_url,banner_url,platform,languages,release_date,status,created_at,updated_at,reviewed_at';
-export const gameDetailsFields = gameFields + ',minimum_requirements,recommended_requirements,ai_disclosure';
+export const gameDetailsFields = gameFields + ',hero_media,minimum_requirements,recommended_requirements,ai_disclosure';
 
 export type Game = {
   id:string; developer_id:string; title:string; slug:string|null; short_description:string|null; description:string|null;
   genre:string|null; price:number; cover_url:string|null; banner_url:string|null; platform:string[]|null; languages:string[]|null;
   release_date:string|null; created_at:string; updated_at:string; status:'draft'|'pending'|'published'|'rejected';
-  minimum_requirements?:string|null; recommended_requirements?:string|null; ai_disclosure?:string|null;
+  hero_media?:'trailer'|'banner'; minimum_requirements?:string|null; recommended_requirements?:string|null; ai_disclosure?:string|null;
   rating_average?:number|null; review_count?:number;
 };
 export type Media = {id:string;media_url:string;media_type:'screenshot'|'trailer';position:number};
