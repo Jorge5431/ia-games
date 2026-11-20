@@ -17,7 +17,7 @@ export default async function Page({params}:{params:Promise<{id:string}>}) {
   const {client,game}=await ownerGame(id,'media');
   const {data,error}=await client.from('game_media').select('id,media_type,media_url').eq('game_id',id).order('position').order('id');
   if(error) throw new Error('Não foi possível carregar as mídias.');
-  const editable=['draft','rejected'].includes(game.status);
+  const editable=['draft','rejected','published'].includes(game.status);
   const uploads=[['cover_url','Capa','Enviar capa'],['banner_url','Banner','Enviar banner']] as const;
   const preview=data.find(item=>item.media_type==='trailer'&&isDirectVideoUrl(item.media_url))?.media_url;
   return <PortalShell kind="developer" title="2. Identidade visual e gameplay">
@@ -27,9 +27,10 @@ export default async function Page({params}:{params:Promise<{id:string}>}) {
     {uploads.map(([kind,title])=>{
       const image=publicImage(game[kind]);
       return <div className="panel" key={kind}><h2>{title}</h2><p className="muted">{kind==="cover_url"?"Recomendado: 1280 × 800 px (16:10). Aparece nos cards.":kind==="banner_url"?"Recomendado: 1920 × 1080 px (16:9). Fundo da página do jogo.":"Recomendado: 1920 × 1080 px. Imagens reais do gameplay."}</p>
-        {editable && game.status==='draft' ? <GameImageUpload id={id} kind={kind} current={image}/> : image && <Image src={image} alt={title} width={224} height={126}/>}
+        {editable && game.status!=='rejected' ? <GameImageUpload id={id} kind={kind} current={image}/> : image && <Image src={image} alt={title} width={224} height={126}/>}
       </div>;
     })}
+    {editable && <div className="panel"><h2>Capturas de tela</h2><p className="muted">Adicione imagens do gameplay. Jogos publicados passam por análise de mídia, exceto publicação direta autorizada.</p><GameImageUpload id={id} kind="screenshot" current={null}/></div>}
     {editable && <div className="panel"><h2>Trailer e vídeo de fundo</h2>
       <p className="muted">Envie um vídeo MP4 ou WebM do seu dispositivo, ou cole um link. O primeiro vídeo MP4 ou WebM direto será usado no preview do card e como fundo cinematográfico da página do jogo; a capa será exibida enquanto o vídeo carrega.</p>
       <VideoUpload id={id}/><ActionForm action={editMedia.bind(null,id,'trailer')} label="Salvar vídeo"><Field name="url" label="Link HTTPS do vídeo (MP4 ou WebM para o fundo)" type="url" max={500} placeholder="https://estudio.com/gameplay.mp4" required/></ActionForm>
@@ -39,7 +40,7 @@ export default async function Page({params}:{params:Promise<{id:string}>}) {
       return <div key={item.id} className="row">
         {item.media_type==='screenshot'&&image ? <Image src={image} alt="Captura de tela" width={160} height={90}/> :
           item.media_type==='trailer'&&httpsUrl.safeParse(item.media_url).success ? <a className="text-link" href={item.media_url} target="_blank" rel="noopener noreferrer">{item.media_url.match(/\.(mp4|webm)(?:\?|$)/i)?'Vídeo de fundo · abrir arquivo':'Abrir trailer'}</a> : <p>Mídia indisponível</p>}
-        {editable && <ActionForm action={removeMedia.bind(null,id,item.id)} label="Remover mídia" secondary/>}
+        {editable && game.status!=='published' && <ActionForm action={removeMedia.bind(null,id,item.id)} label="Remover mídia" secondary/>}
       </div>;
     })}</div>}
     <Link className="button" href={'/developer/games/'+id+'/edit'}>Voltar para publicação</Link>

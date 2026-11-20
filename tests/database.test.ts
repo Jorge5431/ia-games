@@ -10,6 +10,11 @@ const free='10000000-0000-4000-8000-000000000001';
 const paid='10000000-0000-4000-8000-000000000002';
 const draft='10000000-0000-4000-8000-000000000003';
 const pending='10000000-0000-4000-8000-000000000004';
+const rejected='10000000-0000-4000-8000-000000000005';
+const withLibrary='10000000-0000-4000-8000-000000000006';
+const withVersion='10000000-0000-4000-8000-000000000007';
+const withReview='10000000-0000-4000-8000-000000000008';
+const withSession='10000000-0000-4000-8000-000000000009';
 const db=new PGlite();
 
 async function as(role:'authenticated'|'anon',id:string,query:string) {
@@ -47,7 +52,21 @@ beforeAll(async()=>{
       ('${free}','${developer}','Fixture gratuita','fixture-gratuita','Descrição','Declaração',0,'published'),
       ('${paid}','${developer}','Fixture paga','fixture-paga','Descrição','Declaração',89.90,'published'),
       ('${draft}','${developer}','Fixture privada','fixture-privada','Descrição','Declaração',0,'draft'),
-      ('${pending}','${developer}','Fixture pendente','fixture-pendente','Descrição','Declaração',0,'pending');
+      ('${pending}','${developer}','Fixture pendente','fixture-pendente','Descrição','Declaração',0,'pending'),
+      ('${rejected}','${developer}','Fixture rejeitada','fixture-rejeitada','Descrição','Declaração',0,'rejected'),
+      ('${withLibrary}','${developer}','Fixture com biblioteca','fixture-com-biblioteca','Descrição','Declaração',0,'draft'),
+      ('${withVersion}','${developer}','Fixture com versão','fixture-com-versao','Descrição','Declaração',0,'draft'),
+      ('${withReview}','${developer}','Fixture com avaliação','fixture-com-avaliacao','Descrição','Declaração',0,'draft'),
+      ('${withSession}','${developer}','Fixture com sessão','fixture-com-sessao','Descrição','Declaração',0,'draft');
+    insert into public.user_library(user_id,game_id) values ('${other}','${withLibrary}');
+    insert into public.game_versions(game_id,version) values ('${withVersion}','1.0');
+    insert into public.reviews(user_id,game_id,rating) values ('${player}','${withReview}',5);
+    insert into public.game_play_sessions(game_id,player_id) values ('${withSession}','${player}');
+    insert into public.game_delivery_intake(game_id,delivery_kind,source_url) values ('${rejected}','web','https://example.com/game');
+    insert into public.game_updates(game_id,title,description,notes) values ('${rejected}','Atualização de fixture','Descrição','Notas');
+    insert into public.game_media(game_id,media_url,media_type) values ('${rejected}','http://localhost:54321/storage/v1/object/public/game-images/${developer}/10000000-0000-4000-8000-000000000010.png','screenshot');
+    insert into public.game_moderation_history(game_id,status_from,status_to) values ('${rejected}','pending','rejected');
+    insert into public.wishlists(user_id,game_id) values ('${player}','${rejected}');
   `);
 });
 
@@ -89,6 +108,26 @@ describe('schema, papéis e Storage',()=>{
 });
 
 describe('fluxos persistidos',()=>{
+  it('exclui somente rascunhos ou rejeitados do dono sem histórico de jogadores',async()=>{
+    await expect(anon(`select public.delete_own_game('${draft}')`)).rejects.toThrow(/permission denied/);
+    await expect(by(other,`select public.delete_own_game('${draft}')`)).rejects.toThrow(/sem permissão/);
+    await expect(by(developer,`select public.delete_own_game('${free}')`)).rejects.toThrow(/Apenas rascunhos e jogos rejeitados/);
+    for(const gameId of [withLibrary,withVersion,withReview,withSession]){
+      await expect(by(developer,`select public.delete_own_game('${gameId}')`)).rejects.toThrow(/histórico ou instalações/);
+    }
+
+    await by(developer,`select public.delete_own_game('${rejected}')`);
+    expect((await db.query(`select id from public.games where id='${rejected}'`)).rows).toEqual([]);
+    expect((await db.query(`
+      select
+        (select count(*)::int from public.game_delivery_intake where game_id='${rejected}') as delivery,
+        (select count(*)::int from public.game_updates where game_id='${rejected}') as updates,
+        (select count(*)::int from public.game_media where game_id='${rejected}') as media,
+        (select count(*)::int from public.game_moderation_history where game_id='${rejected}') as moderation,
+        (select count(*)::int from public.wishlists where game_id='${rejected}') as wishlists
+    `)).rows).toEqual([{delivery:0,updates:0,media:0,moderation:0,wishlists:0}]);
+  });
+
   it('aprova um desenvolvedor e registra o revisor',async()=>{
     await by(other,`insert into developer_applications(user_id,studio_name) values ('${other}','Estúdio fixture')`);
     const [application]=await by(other,`select id from developer_applications where user_id='${other}'`) as {id:string}[];

@@ -1,8 +1,8 @@
 import Image from 'next/image';
-import { ImageField } from '@/components/image-field';
+import { AvatarCrop } from '@/components/avatar-crop';
 import { requireSession } from '@/lib/supabase';
 import { publicImage } from '@/lib/catalog';
-import { changeAvatar, updateProfile } from '@/lib/player-actions';
+import { updateProfile } from '@/lib/player-actions';
 import { AccountShell } from '@/components/account-shell';
 import { ActionForm, Field, Notes } from '@/components/action-form';
 
@@ -20,7 +20,7 @@ export default async function Page() {
       <Notes name="bio" label="Biografia" value={data.bio} maxLength={500}/>
     </ActionForm></div>
     <div className="panel"><h2>Avatar</h2>{avatar && <Image src={avatar} alt="Seu avatar" className="avatar" width={78} height={78}/>}
-      <ActionForm action={changeAvatar} label="Enviar avatar"><ImageField/></ActionForm>
+      <AvatarCrop/>
     </div>
   </AccountShell>;
 }

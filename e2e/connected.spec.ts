@@ -20,7 +20,7 @@ async function login(page:Page,email:string,secret= password) {
   await page.getByRole('button',{name:'Entrar',exact:true}).click();
 }
 
-async function clickMailLink(page:Page,request:APIRequestContext,email:string,type:'email'|'recovery') {
+async function mailCode(request:APIRequestContext,email:string,type:'email'|'recovery') {
   let messageId='';
   const subject=type==='email'?'Confirme sua conta Vornelix':'Redefina sua senha Vornelix';
   await expect.poll(async()=>{
@@ -33,9 +33,9 @@ async function clickMailLink(page:Page,request:APIRequestContext,email:string,ty
   const response=await request.get('http://127.0.0.1:54324/api/v1/message/'+messageId);
   expect(response.ok()).toBeTruthy();
   const message=await response.json() as {HTML:string};
-  const link=message.HTML.match(/href="([^"]+)"/)?.[1].replaceAll('&amp;','&');
-  expect(link).toContain('type='+type);
-  await page.goto(link!);
+  const code=message.HTML.match(/<strong>(\d{6})<\/strong>/)?.[1];
+  expect(code).toMatch(/^\d{6}$/);
+  return code!;
 }
 
 test.describe('Supabase local com Auth, Storage e Data API',()=>{
@@ -51,7 +51,8 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     await page.getByLabel('Confirme a senha').fill(password);
     await page.getByRole('checkbox').check();
     await page.getByRole('button',{name:'Cadastrar',exact:true}).click();
-    await expect(page.getByRole('status')).toContainText('receberá as instruções por e-mail');
+    await expect(page).toHaveURL('/verify-email');
+    await expect(page.getByRole('heading',{name:'Verifique seu e-mail'})).toBeVisible();
     const users=await supabase.auth.admin.listUsers();
     expect(users.error).toBeNull();
     const user=users.data.users.find(entry=>entry.email===email);
@@ -59,7 +60,8 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     const profile=await supabase.from('profiles').select('role,display_name').eq('id',user!.id).single();
     expect(profile.data).toEqual({role:'player',display_name:'Jogador teste'});
 
-    await clickMailLink(page,request,email,'email');
+    await page.getByLabel('Código de confirmação').fill(await mailCode(request,email,'email'));
+    await page.getByRole('button',{name:'Confirmar e-mail'}).click();
     await expect(page.getByRole('heading',{name:'E-mail confirmado!'})).toBeVisible();
     await page.getByRole('link',{name:'Continuar para minha conta'}).click();
     await expect(page).toHaveURL('/account');
@@ -70,7 +72,8 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     await page.getByRole('button',{name:'Salvar perfil'}).click();
     await expect(page.getByRole('status')).toHaveText('Perfil salvo.');
     await page.locator('input[type=file]').setInputFiles('public/marca-vornelix.webp');
-    await page.getByRole('button',{name:'Enviar avatar'}).click();
+    await expect(page.getByRole('img',{name:'Prévia circular do avatar'})).toBeVisible();
+    await page.getByRole('button',{name:'Confirmar recorte e salvar'}).click();
     await expect(page.getByRole('status').filter({hasText:'Avatar atualizado.'})).toBeVisible();
     await expect(page.getByRole('img',{name:'Seu avatar'})).toBeVisible();
     await page.goto('/admin');
@@ -87,16 +90,13 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
 
     await page.goto('/forgot-password');
     await page.getByLabel('E-mail').fill(email);
-    await page.getByRole('button',{name:'Enviar link'}).click();
-    await expect(page.getByRole('status')).toContainText('link de recuperação');
-    await clickMailLink(page,request,email,'recovery');
-    await expect(page).toHaveURL('/reset-password');
-    await page.getByLabel('Senha',{exact:true}).fill(changedPassword);
-    await page.getByLabel('Confirme a senha').fill(changedPassword);
+    await page.getByRole('button',{name:'Enviar código'}).click();
+    await expect(page).toHaveURL('/forgot-password?etapa=codigo');
+    await page.getByLabel('Código de verificação').fill(await mailCode(request,email,'recovery'));
+    await page.getByLabel('Nova senha',{exact:true}).fill(changedPassword);
+    await page.getByLabel('Confirme a nova senha').fill(changedPassword);
     await page.getByRole('button',{name:'Redefinir senha'}).click();
-    await expect(page.getByRole('status')).toHaveText('Senha atualizada.');
-    await page.goto('/account');
-    await page.getByRole('button',{name:'Sair'}).click();
+    await expect(page).toHaveURL('/login?senha=atualizada');
     await login(page,email,changedPassword);
     await expect(page).toHaveURL('/account');
   });
@@ -122,9 +122,9 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     await expect(page).toHaveURL('/account');
     await page.goto('/developer/apply');
     await page.getByLabel('Nome do estúdio').fill('Estúdio '+run);
-    await page.getByLabel('Como você usa IA').fill('Utilizamos IA na criação dos recursos visuais.');
-    await page.getByRole('button',{name:'Enviar solicitação'}).click();
-    await expect(page.getByText(/Solicitação de Estúdio.*Em análise/)).toBeVisible();
+    await page.getByLabel('Conte sobre seu projeto e uso de IA').fill('Utilizamos IA na criação dos recursos visuais.');
+    await page.getByRole('button',{name:'Enviar solicitação para análise'}).click();
+    await expect(page.getByText('Estúdio '+run+' · Em análise')).toBeVisible();
 
     const adminContext=await browser.newContext();
     const adminPage=await adminContext.newPage();
@@ -134,20 +134,39 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     await adminPage.getByRole('heading',{name:'Estúdio '+run}).locator('../..').getByRole('button',{name:'Aprovar',exact:true}).click();
     await expect(adminPage.getByRole('heading',{name:'Estúdio '+run}).locator('..')).toContainText('Aprovada');
 
-    const title='Jogo gratuito '+run;
-    const slug='jogo-gratuito-'+run;
+    const removableTitle='Rascunho removível '+run;
     await page.goto('/developer/games/new');
-    await page.getByLabel('Título').fill(title);
-    await page.getByLabel('Endereço do jogo').fill(slug);
-    await page.getByLabel('Descrição completa').fill('Descrição cadastrada para o teste de integração.');
-    await page.getByLabel('Declaração do uso de IA').fill('IA utilizada para criar texturas.');
+    await page.getByLabel('Título').fill(removableTitle);
+    await page.getByLabel('Descrição do jogo').fill('Rascunho criado para testar a exclusão do desenvolvedor.');
     await page.getByRole('button',{name:'Salvar rascunho'}).click();
     await expect(page).toHaveURL(/\/developer\/games\/[a-f0-9-]+\/edit/);
+    const removableId=new URL(page.url()).pathname.split('/')[3];
+    await page.goto('/developer/games');
+    const removableRow=page.locator('.row').filter({hasText:removableTitle});
+    await removableRow.getByText('Excluir definitivamente',{exact:true}).click();
+    await removableRow.getByLabel('Confirmo a exclusão definitiva deste jogo.').check();
+    await removableRow.getByRole('button',{name:'Excluir jogo permanentemente'}).click();
+    await expect(removableRow).toHaveCount(0);
+    expect((await supabase.from('games').select('id').eq('id',removableId)).data).toEqual([]);
+
+    const title='Jogo gratuito '+run;
+    await page.goto('/developer/games/new');
+    await page.getByLabel('Título').fill(title);
+    await page.getByLabel('Descrição do jogo').fill('Descrição cadastrada para o teste de integração.');
+    await page.getByRole('button',{name:'Salvar rascunho'}).click();
+    await expect(page).toHaveURL(/\/developer\/games\/[a-f0-9-]+\/edit/);
+    const gameId=new URL(page.url()).pathname.split('/')[3];
+    const draft=await supabase.from('games').select('slug,status').eq('id',gameId).single();
+    expect(draft.error).toBeNull();
+    expect(draft.data?.status).toBe('draft');
+    const slug=draft.data!.slug;
     await page.getByRole('link',{name:'Mídias'}).click();
-    await page.getByRole('button',{name:'Enviar capa'}).locator('..').locator('input[type=file]').setInputFiles('public/marca-vornelix.webp');
-    await page.getByRole('button',{name:'Enviar capa'}).click();
-    await expect(page.getByRole('img',{name:'Capa',exact:true})).toBeVisible();
-    await page.getByRole('link',{name:/Voltar para/}).click();
+    const cover=page.locator('.panel').filter({has:page.getByRole('heading',{name:'Capa',exact:true})});
+    await cover.locator('input[type=file]').setInputFiles('public/marca-vornelix.webp');
+    await cover.getByRole('button',{name:'Salvar imagem'}).click();
+    await expect(cover.getByRole('status')).toHaveText('Imagem salva!');
+    await expect(cover.getByRole('img',{name:'Prévia'})).toBeVisible();
+    await page.getByRole('link',{name:'Voltar para publicação',exact:true}).click();
     const guestContext=await browser.newContext({reducedMotion:'reduce'});
     const guest=await guestContext.newPage();
     const hydrationErrors:string[]=[];
@@ -157,7 +176,12 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     await guest.goto('/game/'+slug);
     await expect(guest.getByRole('heading',{level:1})).toHaveText('Página não encontrada');
 
-    await page.getByRole('button',{name:'Enviar para análise'}).click();
+    await page.getByLabel('Formato').selectOption('windows_zip');
+    await page.getByLabel('Link HTTPS').fill('https://example.com/game.zip');
+    await page.getByRole('button',{name:'Salvar jogo para análise'}).click();
+    await expect(page.getByRole('button',{name:'Salvar e enviar para análise'})).toBeVisible();
+    await page.getByLabel('Declaração de uso de IA').fill('Os recursos visuais do jogo foram criados com apoio de IA generativa.');
+    await page.getByRole('button',{name:'Salvar e enviar para análise'}).click();
     await expect(page).toHaveURL('/developer/submissions');
     await adminPage.goto('/admin/moderation');
     const moderation=adminPage.getByRole('heading',{name:title,exact:true}).locator('..');
@@ -165,7 +189,7 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     await moderation.getByRole('button',{name:'Registrar decisão'}).click();
     await expect(moderation).toHaveCount(0);
     await guest.goto('/');
-    await expect(guest.getByRole('heading',{level:1})).toHaveText(title);
+    await expect(guest.getByRole('link',{name:new RegExp(title)}).first()).toBeVisible();
     await guest.goto('/search?q='+encodeURIComponent(title));
     await guest.getByRole('link',{name:new RegExp(title)}).click();
     await expect(guest.getByRole('heading',{level:1})).toHaveText(title);
@@ -203,9 +227,24 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     await expect(buyerPage.locator('p').filter({hasText:'Comentário do teste integrado'})).toBeVisible();
     await buyerPage.getByLabel('Nota').selectOption('4');
     await buyerPage.getByRole('button',{name:'Editar avaliação'}).click();
-    await expect(buyerPage.getByText('1 avaliação',{exact:false})).toBeVisible();
+    await expect(buyerPage.getByRole('region',{name:'Detalhes de '+title}).getByText('1 avaliação',{exact:false})).toBeVisible();
     await buyerPage.getByRole('button',{name:'Excluir avaliação'}).click();
-    await expect(buyerPage.getByText('Sem avaliações',{exact:true})).toBeVisible();
+    const reviewsPanel=buyerPage.getByRole('heading',{name:'Avaliações',exact:true}).locator('..');
+    await expect(reviewsPanel.getByText('Sem avaliações',{exact:true})).toBeVisible();
+
+    const webDelivery=await supabase.from('game_delivery_intake').update({delivery_kind:'web',source_url:'https://example.com/game'}).eq('game_id',freeId);
+    expect(webDelivery.error).toBeNull();
+    await buyerPage.goto('/game/'+slug);
+    const [playerTab]=await Promise.all([
+      buyerPage.waitForEvent('popup'),
+      buyerPage.getByRole('link',{name:'Jogar agora',exact:true}).click(),
+    ]);
+    await expect(playerTab).toHaveURL('/play/'+freeId);
+    await expect(playerTab.getByRole('link',{name:'Abrir jogo diretamente'})).toHaveAttribute('href','https://example.com/game');
+    await playerTab.getByRole('button',{name:'Tela cheia'}).click();
+    await expect(playerTab.getByRole('button',{name:'Sair da tela cheia'})).toBeVisible();
+    await expect.poll(()=>playerTab.evaluate(()=>document.fullscreenElement!==null)).toBe(true);
+    await playerTab.close();
 
     const developerId=(await supabase.auth.admin.listUsers()).data.users.find(user=>user.email===developer)?.id;
     expect(developerId).toBeTruthy();
