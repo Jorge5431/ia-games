@@ -1,0 +1,7 @@
+VORNELIX TELEMETRY v1
+Use a Supabase client authenticated as the actual player, with the public publishable key only. Never embed a service role key or ask for the player's password. An existing authenticated client must be provided by an approved game integration; external games need a separate secure login handoff (not yet provided).
+import {createTelemetry} from './telemetry-sdk.js';
+const telemetry=createTelemetry({client,gameId:'YOUR_PUBLISHED_GAME_UUID'});
+await telemetry.start(); // when actual gameplay begins
+await telemetry.stop(); // when gameplay ends
+Heartbeat every 30 seconds. Active status expires after 120 seconds. No background tracking outside gameplay. Inform players and obtain appropriate consent before enabling. Do not pass personal data. Client signals are estimates and can be manipulated. Desktop games can call the same authenticated RPC with p_game, p_event and p_session; native SDK and login handoff not yet implemented.
