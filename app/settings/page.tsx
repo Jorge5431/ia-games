@@ -1,3 +1,3 @@
 import { PreferencesPanel } from '@/components/preferences-panel';
 export const metadata={title:'Preferências'};
-export default function Page(){return <div className="container page"><PreferencesPanel/></div>;}
+export default function Page(){return <div className="container page"><PreferencesPanel heading="h1"/></div>;}

@@ -4,7 +4,7 @@ const publicRoutes=[
   ['/','VORNELIX — Gaming Reimagined'],['/store','Loja'],['/discover','Descobrir jogos'],['/categories','Categorias'],
   ['/category/acao','Ação'],['/search','Pesquisar jogos'],['/about','Sobre a Vornelix'],['/support','Suporte'],
   ['/terms','Termos de uso'],['/privacy','Privacidade'],['/login','Entre na Vornelix'],['/register','Crie sua conta'],
-  ['/forgot-password','Recupere sua senha'],
+  ['/forgot-password','Recupere sua senha'],['/settings','Aparência e experiência'],
 ] as const;
 
 test('rotas públicas, metadados e ausência de erros JavaScript',async({page})=>{
