@@ -114,6 +114,16 @@ describe('schema, papéis e Storage',()=>{
     expect(await anon(`select published_game_developer('${draft}') as developer`)).toEqual([{developer:null}]);
   });
 
+  it('mantém pacotes de rascunho acessíveis ao estúdio e privados para jogadores',async()=>{
+    const path = developer + '/' + draft + '/fixture.zip';
+    const bucket = await db.query("select public from storage.buckets where id='game-packages'");
+    expect(bucket.rows).toEqual([{public:false}]);
+    await by(developer,`insert into storage.objects(bucket_id,name) values ('game-packages','${path}')`);
+    const lookup = `select name from storage.objects where bucket_id='game-packages' and name='${path}'`;
+    expect(await by(developer,lookup)).toEqual([{name:path}]);
+    expect(await by(player,lookup)).toEqual([]);
+  });
+
   it('permite imagens na pasta do usuário e bloqueia executáveis e pastas alheias',async()=>{
     await expect(by(player,`insert into storage.objects(bucket_id,name) values ('avatars','${player}/avatar.png')`)).resolves.toEqual([]);
     await expect(by(player,`insert into storage.objects(bucket_id,name) values ('avatars','${developer}/avatar.png')`)).rejects.toThrow(/row-level security/);
