@@ -227,7 +227,7 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     await expect(buyerPage.locator('p').filter({hasText:'Comentário do teste integrado'})).toBeVisible();
     await buyerPage.getByLabel('Nota').selectOption('4');
     await buyerPage.getByRole('button',{name:'Editar avaliação'}).click();
-    await expect(buyerPage.getByText('1 avaliação',{exact:false})).toBeVisible();
+    await expect(buyerPage.getByRole('region',{name:'Detalhes de '+title}).getByText('1 avaliação',{exact:false})).toBeVisible();
     await buyerPage.getByRole('button',{name:'Excluir avaliação'}).click();
     await expect(buyerPage.getByText('Sem avaliações',{exact:true})).toBeVisible();
 
