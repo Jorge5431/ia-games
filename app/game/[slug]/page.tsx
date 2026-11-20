@@ -70,10 +70,10 @@ export default async function Page({params}:Props) {
       <Link className="button" href={'/checkout/'+game.id}>{game.price===0?'Adicionar à biblioteca':'Comprar'}</Link>}
   </>;
   return <article className="container page detail-page">
-    <GameDetailHero title={game.title} genre={game.genre} description={game.short_description} cover={cover} poster={poster} gameplay={gameplay} rating={ratingLabel} platforms={game.platform||[]} purchase={purchase}/>
+    <GameDetailHero title={game.title} genre={game.genre} description={game.short_description} cover={cover} poster={poster} gameplay={gameplay} heroMedia={game.hero_media} rating={ratingLabel} platforms={game.platform||[]} purchase={purchase}/>
     <div className="detail-grid">
       <div className="page-section detail-main-column">
-        <Gallery images={screenshots} title={game.title}/>
+        {screenshots.length>2&&<Gallery images={screenshots} title={game.title}/>}
         {trailers.length>0 && <section className="toolbar detail-reveal">{trailers.map((item,index)=><a key={item.id} className="button secondary" href={item.media_url} target="_blank" rel="noopener noreferrer">Assistir ao trailer{trailers.length>1?' '+(index+1):''}</a>)}</section>}
         {game.description && <section className="panel detail-reveal"><h2><FallingText text={"Sobre o jogo"}/></h2><p className="preformatted">{game.description}</p></section>}
         {(game.minimum_requirements||game.recommended_requirements) && <section className="panel detail-reveal"><h2><FallingText text={"Requisitos do sistema"}/></h2>
