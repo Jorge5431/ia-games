@@ -232,6 +232,20 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     const reviewsPanel=buyerPage.getByRole('heading',{name:'Avaliações',exact:true}).locator('..');
     await expect(reviewsPanel.getByText('Sem avaliações',{exact:true})).toBeVisible();
 
+    const webDelivery=await supabase.from('game_delivery_intake').update({delivery_kind:'web',source_url:'https://example.com/game'}).eq('game_id',freeId);
+    expect(webDelivery.error).toBeNull();
+    await buyerPage.goto('/game/'+slug);
+    const [playerTab]=await Promise.all([
+      buyerPage.waitForEvent('popup'),
+      buyerPage.getByRole('link',{name:'Jogar agora',exact:true}).click(),
+    ]);
+    await expect(playerTab).toHaveURL('/play/'+freeId);
+    await expect(playerTab.getByRole('link',{name:'Abrir jogo diretamente'})).toHaveAttribute('href','https://example.com/game');
+    await playerTab.getByRole('button',{name:'Tela cheia'}).click();
+    await expect(playerTab.getByRole('button',{name:'Sair da tela cheia'})).toBeVisible();
+    await expect.poll(()=>playerTab.evaluate(()=>document.fullscreenElement!==null)).toBe(true);
+    await playerTab.close();
+
     const developerId=(await supabase.auth.admin.listUsers()).data.users.find(user=>user.email===developer)?.id;
     expect(developerId).toBeTruthy();
     const paid=await supabase.from('games').insert({
