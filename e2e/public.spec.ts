@@ -90,7 +90,9 @@ test('menu mobile, teclado e preferência por movimento reduzido',async({page,br
   await touch.getByRole('button',{name:'Abrir menu'}).tap();
   const navigation=touch.getByRole('navigation',{name:'Menu de navegação'});
   await expect(navigation).toBeVisible();
+  await navigation.getByRole('link').first().focus();
   await touch.keyboard.press('Escape');
+  await expect(touch.getByRole('button',{name:'Abrir menu'})).toBeFocused();
   await expect(navigation).toBeHidden();
   await touch.getByRole('button',{name:'Abrir menu'}).tap();
   await navigation.getByRole('link',{name:'Descobrir'}).tap();

@@ -73,6 +73,31 @@ beforeAll(async()=>{
 afterAll(async()=>db.close());
 
 describe('schema, papéis e Storage',()=>{
+  it('mantém as RPCs públicas sem privilégios elevados e protege a escolha de mídia',async()=>{
+    const wrappers = await db.query(`
+      select proname, prosecdef from pg_proc
+      where pronamespace = 'public'::regnamespace
+        and proname in ('delete_own_game','set_game_hero_media') order by proname
+    `);
+    expect(wrappers.rows).toEqual([
+      {proname:'delete_own_game',prosecdef:false},
+      {proname:'set_game_hero_media',prosecdef:false},
+    ]);
+    await expect(anon(`select set_game_hero_media('${free}','banner')`)).rejects.toThrow(/permission denied/);
+    await expect(by(other,`select set_game_hero_media('${free}','banner')`)).rejects.toThrow(/sem permissão/);
+    await by(developer,`select set_game_hero_media('${free}','banner')`);
+    expect(await anon(`select hero_media from games where id='${free}'`)).toEqual([{hero_media:'banner'}]);
+  });
+
+  it('mantém sessões privadas e restringe a caixa de notificações ao destinatário',async()=>{
+    await expect(by(player,'select id from game_play_sessions')).rejects.toThrow(/permission denied/);
+    const inbox = 'select user_id from notifications';
+    expect(await by(player,inbox)).toEqual([]);
+    const received = await by(developer,inbox);
+    expect(received.length).toBeGreaterThan(0);
+    for (const row of received) expect(row).toEqual({user_id:developer});
+  });
+
   it('cria perfil player e resolve colisão no trigger',async()=>{
     expect(await by(player,`select username,display_name,role from profiles where id='${player}'`)).toEqual([{username:'duplicate',display_name:'Jogador teste',role:'player'}]);
     expect(await by(developer,`select role, username='duplicate' as collision from profiles where id='${developer}'`)).toEqual([{role:'developer',collision:false}]);

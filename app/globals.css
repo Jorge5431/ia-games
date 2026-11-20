@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-:root{color-scheme:dark;--bg:#080808;--bg2:#181818;--surface:#202020;--primary:#D92332;--accent:#FF6500;--text:#F5F5F5;--muted:#B8B8B8;--line:#626262;--button-text:#F5F5F5;--focus:#FF9A4D;--display:"Orbitron Variable",Arial,sans-serif;--support:"Instrument Sans Variable",Arial,sans-serif;--body:"Instrument Sans Variable",system-ui,sans-serif}
+:root{color-scheme:dark;--bg:#100d0e;--bg2:#21191a;--surface:#302322;--primary:#9e3046;--accent:#FF6500;--text:#F5F5F5;--muted:#B8B8B8;--line:#626262;--button-text:#F5F5F5;--focus:#FF9A4D;--display:"Orbitron Variable",Arial,sans-serif;--support:"Instrument Sans Variable",Arial,sans-serif;--body:"Instrument Sans Variable",system-ui,sans-serif}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);font-size:16px;line-height:1.55}
 a{color:inherit;text-decoration:none}
@@ -607,7 +607,7 @@ h2{letter-spacing:.005em}
 :root[data-motion=reduced] .brand .brand-name.brand-shimmer{animation:none;background:none;-webkit-text-fill-color:currentColor;filter:none}
 
 /* Compact universal menu and catalog search. */
-.site-header .compact-menu-toggle{display:inline-flex!important;align-items:center;justify-content:center;width:36px;min-width:36px;height:40px;padding:0;background:transparent;border:0;box-shadow:none;color:var(--text)}
+.site-header .compact-menu-toggle{display:inline-flex!important;align-items:center;justify-content:center;width:44px;min-width:44px;height:44px;padding:0;background:transparent;border:0;box-shadow:none;color:var(--text)}
 .site-header .compact-menu{display:grid!important;position:absolute;inset:100% max(12px,calc((100% - 1320px)/2)) auto auto;width:min(260px,calc(100vw - 24px));padding:.55rem;background:var(--bg2);color:var(--text);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px #0003;z-index:30}
 .compact-menu a{display:flex;align-items:center;gap:.6rem;padding:.75rem;border-radius:7px;color:var(--text)}
 .site-header .header-profile{flex-shrink:0;gap:.45rem}

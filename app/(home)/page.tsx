@@ -17,7 +17,7 @@ export default async function Home({searchParams}:{searchParams:Promise<{code?:s
     catalog(filters({price:'free'}),4),catalog(filters({price:'paid'}),4),
     catalog(filters({order:'popular',rating:'1'}),4),
   ]);
-  const recommendations = recent.games.filter(game=>!top.games.some(ranked=>ranked.id===game.id)).slice(4,8);
+  const recommendations = recent.games.filter(game=>!top.games.some(ranked=>ranked.id===game.id)).slice(0,4);
   const shelves=[
     ['Lançamentos recentes','/store',recent.games],
     ['Populares por número de avaliações','/store?order=popular&rating=1',popular.games],
@@ -34,7 +34,7 @@ export default async function Home({searchParams}:{searchParams:Promise<{code?:s
       shelves.map(([title,href,games])=>games.length>0 && <section className="page-section" key={title}>
         <div className="section-title"><h2><FallingText text={title}/></h2><Link className="text-link" href={href}>Ver todos</Link></div><GameGrid games={games} tilt={href==='/store'}/>
       </section>)}
-    <section className="page-section creator-invite"><h2><FallingText text="Seu jogo pode estar aqui"/></h2><p>Crie com IA e apresente seu jogo à comunidade VORNELIX.</p><div className="card-grid">{Array.from({length:recent.count?1:3},(_,i)=><article className="game-card creator-card" key={i}><div className="creator-card-art"><Gamepad2 size={42}/><strong>SEU JOGO AQUI!</strong></div><div className="creator-card-body"><p>O próximo lançamento pode ser seu.</p><Button asChild><Link href="/developer/apply"><Upload size={17}/> Enviar meu jogo</Link></Button></div></article>)}</div></section>
+    <section className="page-section creator-invite"><h2><FallingText text="Seu jogo pode estar aqui"/></h2><p>Crie com IA e apresente seu jogo à comunidade VORNELIX.</p><div className="card-grid"><article className="game-card creator-card"><div className="creator-card-art"><Gamepad2 size={42}/><strong>SEU JOGO AQUI!</strong></div><div className="creator-card-body"><p>O próximo lançamento pode ser seu.</p><Button asChild><Link href="/developer/apply"><Upload size={17}/> Enviar meu jogo</Link></Button></div></article></div></section>
     <section className="page-section"><h2><FallingText text={"Explore por categoria"}/></h2><Categories/></section>
     <section className="cinematic-developer"><h2><FallingText text={"Cria jogos com IA?"}/></h2><p className="muted">Solicite acesso ao portal para preparar seu jogo e enviá-lo para análise.</p><div><Button asChild variant="secondary"><Link href="/developer/apply">Tornar-se desenvolvedor<ArrowRight size={17}/></Link></Button></div></section>
     <DeveloperRanking/>
