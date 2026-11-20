@@ -229,7 +229,8 @@ test.describe('Supabase local com Auth, Storage e Data API',()=>{
     await buyerPage.getByRole('button',{name:'Editar avaliação'}).click();
     await expect(buyerPage.getByRole('region',{name:'Detalhes de '+title}).getByText('1 avaliação',{exact:false})).toBeVisible();
     await buyerPage.getByRole('button',{name:'Excluir avaliação'}).click();
-    await expect(buyerPage.getByText('Sem avaliações',{exact:true})).toBeVisible();
+    const reviewsPanel=buyerPage.getByRole('heading',{name:'Avaliações',exact:true}).locator('..');
+    await expect(reviewsPanel.getByText('Sem avaliações',{exact:true})).toBeVisible();
 
     const developerId=(await supabase.auth.admin.listUsers()).data.users.find(user=>user.email===developer)?.id;
     expect(developerId).toBeTruthy();
