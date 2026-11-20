@@ -29,7 +29,8 @@ export function GameDetailHero({title,genre,description,cover,poster,gameplay,ra
   const [playback,setPlayback]=useState<'automatic'|'playing'|'paused'>('automatic');
   const [paused,setPaused]=useState(true);
   const [muted,setMuted]=useState(true);
-  const [videoUnavailable,setVideoUnavailable]=useState(false);
+  const [failedGameplay,setFailedGameplay]=useState<string|null>(null);
+  const videoUnavailable=gameplay!==null&&failedGameplay===gameplay;
 
   useEffect(()=>{
     const video=videoRef.current;
@@ -43,8 +44,9 @@ export function GameDetailHero({title,genre,description,cover,poster,gameplay,ra
   },[muted,playback,reduced,systemReduced,gameplay]);
 
   return <section className="detail-cinematic" aria-label={'Detalhes de '+title}>
-    {poster && <Image className="detail-poster" src={poster} fill sizes="100vw" alt="" priority/>}
-    {gameplay&&!videoUnavailable&&<video ref={videoRef} className="detail-gameplay" src={gameplay} poster={poster||undefined} muted loop playsInline preload="metadata" aria-hidden="true" onPlay={()=>setPaused(false)} onPause={()=>setPaused(true)} onError={()=>setVideoUnavailable(true)}/>}
+    {gameplay&&!videoUnavailable
+      ? <video ref={videoRef} className="detail-gameplay" src={gameplay} poster={poster||undefined} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" onPlay={()=>setPaused(false)} onPause={()=>setPaused(true)} onError={()=>setFailedGameplay(gameplay)}/>
+      : poster&&<Image className="detail-poster" src={poster} fill sizes="100vw" alt="" priority/>}
     <div className="detail-cinematic-shade" aria-hidden="true"/>
     <div className="detail-hero-top">
       <Link className="button secondary detail-back" href="/store"><ArrowLeft size={17}/>Voltar à loja</Link>

@@ -12,7 +12,7 @@ export function Gallery({images,title}: {images:string[];title:string}) {
   const dialog=useRef<HTMLDialogElement>(null);
   const {preferences}=usePreferences();
   const reduced=preferences.motion==='reduced';
-  if(!images.length) return null;
+  if(images.length<3) return null;
   const move = (step:number) => setActive((active+step+images.length)%images.length);
   return <section aria-label="Galeria de imagens" className="gallery detail-reveal" onKeyDown={event=>{
     if(event.key==='ArrowLeft'||event.key==='ArrowRight'){

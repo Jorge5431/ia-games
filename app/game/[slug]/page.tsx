@@ -49,11 +49,12 @@ export default async function Page({params}:Props) {
   }
   stats.average=stats.count?stats.distribution.reduce((total,count,i)=>total+count*(i+1),0)/stats.count:null;
   const assets=(media.data||[]) as Media[];
-  const screenshots=assets.filter(item=>item.media_type==='screenshot').map(item=>publicImage(item.media_url)).filter((url):url is string=>Boolean(url));
+  const screenshots=[...new Set(assets.filter(item=>item.media_type==='screenshot').map(item=>publicImage(item.media_url)).filter((url):url is string=>Boolean(url)))];
   const mediaTrailers=assets.filter(item=>item.media_type==='trailer' && httpsUrl.safeParse(item.media_url).success);
-  const gameplay=mediaTrailers.find(item=>isDirectVideoUrl(item.media_url))?.media_url||null;
-  const trailers=mediaTrailers.filter(item=>!isDirectVideoUrl(item.media_url));
-  const poster=publicImage(game.banner_url||game.cover_url);
+  const directGameplay=mediaTrailers.find(item=>isDirectVideoUrl(item.media_url))?.media_url||null;
+  const gameplay=game.hero_media==='trailer'?directGameplay:null;
+  const trailers=mediaTrailers.filter(item=>!isDirectVideoUrl(item.media_url)||game.hero_media==='banner');
+  const poster=publicImage(game.banner_url)||publicImage(game.cover_url);
   const cover=publicImage(game.cover_url||game.banner_url);
   const relatedGames=related?.games.filter(item=>item.id!==game.id).slice(0,4)||[];
   const detailFields=[
@@ -73,7 +74,7 @@ export default async function Page({params}:Props) {
     <GameDetailHero title={game.title} genre={game.genre} description={game.short_description} cover={cover} poster={poster} gameplay={gameplay} rating={ratingLabel} platforms={game.platform||[]} purchase={purchase}/>
     <div className="detail-grid">
       <div className="page-section detail-main-column">
-        <Gallery images={screenshots} title={game.title}/>
+        {screenshots.length>=3&&<Gallery images={screenshots} title={game.title}/>}
         {trailers.length>0 && <section className="toolbar detail-reveal">{trailers.map((item,index)=><a key={item.id} className="button secondary" href={item.media_url} target="_blank" rel="noopener noreferrer">Assistir ao trailer{trailers.length>1?' '+(index+1):''}</a>)}</section>}
         {game.description && <section className="panel detail-reveal"><h2><FallingText text={"Sobre o jogo"}/></h2><p className="preformatted">{game.description}</p></section>}
         {(game.minimum_requirements||game.recommended_requirements) && <section className="panel detail-reveal"><h2><FallingText text={"Requisitos do sistema"}/></h2>

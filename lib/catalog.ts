@@ -9,6 +9,7 @@ export const gameDetailsFields = gameFields + ',minimum_requirements,recommended
 export type Game = {
   id:string; developer_id:string; title:string; slug:string|null; short_description:string|null; description:string|null;
   genre:string|null; price:number; cover_url:string|null; banner_url:string|null; platform:string[]|null; languages:string[]|null;
+  hero_media?:'trailer'|'banner';
   release_date:string|null; created_at:string; updated_at:string; status:'draft'|'pending'|'published'|'rejected';
   minimum_requirements?:string|null; recommended_requirements?:string|null; ai_disclosure?:string|null;
   rating_average?:number|null; review_count?:number;
@@ -58,7 +59,7 @@ export async function catalog(query: ReturnType<typeof filters>, limit = PAGE_SI
 export async function publishedGame(column:'slug'|'id', value:string) {
   const client = await db();
   if (!client) return null;
-  const {data,error} = await client.from('games').select(gameDetailsFields).eq(column,value).eq('status','published').maybeSingle();
+  const {data,error} = await client.from('games').select(gameDetailsFields+',hero_media').eq(column,value).eq('status','published').maybeSingle();
   if (error) throw new Error('Não foi possível carregar o jogo.');
   return data as unknown as Game|null;
 }
