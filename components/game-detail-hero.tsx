@@ -46,7 +46,7 @@ export function GameDetailHero({title,genre,description,cover,poster,gameplay,he
 
   return <section className="detail-cinematic" aria-label={'Detalhes de '+title}>
     {poster && !showVideo && <Image className="detail-poster" src={poster} fill sizes="100vw" alt="" priority/>}
-    {showVideo&&<video ref={videoRef} className="detail-gameplay" src={gameplay} poster={poster||undefined} muted autoPlay loop playsInline preload="auto" aria-hidden="true" onPlay={()=>setPaused(false)} onPause={()=>setPaused(true)} onError={()=>setVideoUnavailable(true)}/>}
+    {showVideo&&<video ref={videoRef} className="detail-gameplay" src={gameplay ?? undefined} poster={poster||undefined} muted autoPlay loop playsInline preload="auto" aria-hidden="true" onPlay={()=>setPaused(false)} onPause={()=>setPaused(true)} onError={()=>setVideoUnavailable(true)}/>}
     <div className="detail-cinematic-shade" aria-hidden="true"/>
     <div className="detail-hero-top">
       <Link className="button secondary detail-back" href="/store"><ArrowLeft size={17}/>Voltar à loja</Link>
