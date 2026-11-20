@@ -16,12 +16,13 @@ type Props={
   cover:string|null;
   poster:string|null;
   gameplay:string|null;
+  heroMedia?:'banner'|'trailer';
   rating:string;
   platforms:string[];
   purchase:ReactNode;
 };
 
-export function GameDetailHero({title,genre,description,cover,poster,gameplay,rating,platforms,purchase}:Props) {
+export function GameDetailHero({title,genre,description,cover,poster,gameplay,heroMedia='trailer',rating,platforms,purchase}:Props) {
   const videoRef=useRef<HTMLVideoElement>(null);
   const systemReduced=useReducedMotion();
   const {preferences}=usePreferences();
@@ -30,6 +31,7 @@ export function GameDetailHero({title,genre,description,cover,poster,gameplay,ra
   const [paused,setPaused]=useState(true);
   const [muted,setMuted]=useState(true);
   const [videoUnavailable,setVideoUnavailable]=useState(false);
+  const showVideo=heroMedia==='trailer'&&Boolean(gameplay)&&!videoUnavailable;
 
   useEffect(()=>{
     const video=videoRef.current;
@@ -43,12 +45,12 @@ export function GameDetailHero({title,genre,description,cover,poster,gameplay,ra
   },[muted,playback,reduced,systemReduced,gameplay]);
 
   return <section className="detail-cinematic" aria-label={'Detalhes de '+title}>
-    {poster && <Image className="detail-poster" src={poster} fill sizes="100vw" alt="" priority/>}
-    {gameplay&&!videoUnavailable&&<video ref={videoRef} className="detail-gameplay" src={gameplay} poster={poster||undefined} muted loop playsInline preload="metadata" aria-hidden="true" onPlay={()=>setPaused(false)} onPause={()=>setPaused(true)} onError={()=>setVideoUnavailable(true)}/>}
+    {poster && !showVideo && <Image className="detail-poster" src={poster} fill sizes="100vw" alt="" priority/>}
+    {showVideo&&<video ref={videoRef} className="detail-gameplay" src={gameplay} poster={poster||undefined} muted autoPlay loop playsInline preload="auto" aria-hidden="true" onPlay={()=>setPaused(false)} onPause={()=>setPaused(true)} onError={()=>setVideoUnavailable(true)}/>}
     <div className="detail-cinematic-shade" aria-hidden="true"/>
     <div className="detail-hero-top">
       <Link className="button secondary detail-back" href="/store"><ArrowLeft size={17}/>Voltar à loja</Link>
-      {gameplay&&!videoUnavailable&&<div className="detail-video-controls" aria-label="Controles do vídeo de fundo">
+      {showVideo&&<div className="detail-video-controls" aria-label="Controles do vídeo de fundo">
         <button className="icon-button" type="button" aria-label={paused?'Reproduzir vídeo de fundo':'Pausar vídeo de fundo'} aria-pressed={!paused} onClick={()=>setPlayback(videoRef.current?.paused?'playing':'paused')}>{paused?<Play size={18}/>:<Pause size={18}/>}</button>
         <button className="icon-button" type="button" aria-label={muted?'Ativar áudio do vídeo':'Silenciar áudio do vídeo'} aria-pressed={!muted} onClick={()=>setMuted(value=>!value)}>{muted?<VolumeX size={18}/>:<Volume2 size={18}/>}</button>
       </div>}
